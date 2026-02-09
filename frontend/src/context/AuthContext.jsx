@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authenticateUser } from '../services/userService';
+import { formatErrorMessage, isAuthenticationError } from '../utils/errorHandler';
 
 const AuthContext = createContext(null);
 
@@ -27,12 +28,23 @@ export const AuthProvider = ({ children }) => {
     const login = async (username, password) => {
         try {
             const response = await authenticateUser({ username, password });
-            const userData = response.data;
+            const userData = response.data || response;
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
             return userData;
         } catch (error) {
-            throw error;
+            console.error('Authentication error:', error);
+            
+            // Format error message for better user experience
+            const formattedError = new Error();
+            
+            if (isAuthenticationError(error)) {
+                formattedError.message = error.message || 'Invalid username or password';
+            } else {
+                formattedError.message = formatErrorMessage(error) || 'Login failed';
+            }
+            
+            throw formattedError;
         }
     };
 

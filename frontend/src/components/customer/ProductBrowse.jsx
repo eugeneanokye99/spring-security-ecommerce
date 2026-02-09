@@ -5,6 +5,7 @@ import { addToCart } from '../../services/cartService';
 import { useAuth } from '../../context/AuthContext';
 import { ShoppingCart, Search, ChevronDown, Package, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import ProductDetailModal from './ProductDetailModal';
+import { showErrorAlert, formatErrorMessage, isInsufficientStockError } from '../../utils/errorHandler';
 
 const ProductBrowse = () => {
     const [products, setProducts] = useState([]);
@@ -44,6 +45,7 @@ const ProductBrowse = () => {
             setTotalElements(response.data?.totalElements || 0);
         } catch (error) {
             console.error('Error loading products:', error);
+            showErrorAlert(error, 'Failed to load products. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -55,8 +57,13 @@ const ProductBrowse = () => {
 
     useEffect(() => {
         const fetchCategories = async () => {
-            const res = await getAllCategories();
-            setCategories(res.data || []);
+            try {
+                const res = await getAllCategories();
+                setCategories(res.data || []);
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                showErrorAlert(error, 'Failed to load categories');
+            }
         };
         fetchCategories();
     }, []);
@@ -71,7 +78,13 @@ const ProductBrowse = () => {
             await addToCart({ userId: user.userId, productId, quantity: 1 });
             alert('Product added to cart!');
         } catch (error) {
-            alert(error.message);
+            console.error('Error adding to cart:', error);
+            
+            if (isInsufficientStockError(error)) {
+                showErrorAlert(error, 'This item is out of stock');
+            } else {
+                showErrorAlert(error, 'Failed to add item to cart');
+            }
         }
     };
 

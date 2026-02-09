@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getAddressesByUser, createAddress, updateAddress, deleteAddress, setDefaultAddress } from '../../services/addressService';
 import { useAuth } from '../../context/AuthContext';
 import { MapPin, Plus, Trash2, Home, Briefcase, Star, CheckCircle } from 'lucide-react';
+import { showErrorAlert, formatErrorMessage } from '../../utils/errorHandler';
 
 const AddressManagement = () => {
     const { user } = useAuth();
@@ -30,6 +31,7 @@ const AddressManagement = () => {
             setAddresses(response.data || []);
         } catch (error) {
             console.error('Error loading addresses:', error);
+            showErrorAlert(error, 'Failed to load addresses');
         } finally {
             setLoading(false);
         }
@@ -80,7 +82,8 @@ const AddressManagement = () => {
                 await deleteAddress(id);
                 loadAddresses();
             } catch (error) {
-                alert(error.message);
+                console.error('Error saving address:', error);
+                showErrorAlert(error, editingAddress ? 'Failed to update address' : 'Failed to add address');
             }
         }
     };

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ShoppingBag, Lock, User, AlertCircle } from 'lucide-react';
+import { formatErrorMessage, showErrorAlert, isAuthenticationError } from '../utils/errorHandler';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -26,7 +27,14 @@ const Login = () => {
                 navigate('/customer/dashboard');
             }
         } catch (err) {
-            setError(err.message || 'Invalid credentials. Please try again.');
+            console.error('Login error:', err);
+            const errorMessage = formatErrorMessage(err, true);
+            
+            if (isAuthenticationError(err)) {
+                setError(err.message || 'Invalid username or password. Please check your credentials.');
+            } else {
+                setError(errorMessage || 'Login failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }

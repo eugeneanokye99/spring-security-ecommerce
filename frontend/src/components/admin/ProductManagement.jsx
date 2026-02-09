@@ -481,111 +481,133 @@ const ProductManagement = () => {
                             </h2>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Name</label>
-                                    <input
-                                        type="text"
-                                        value={formData.productName}
-                                        onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
-                                        className="input-field"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">SKU</label>
-                                    <input
-                                        type="text"
-                                        value={formData.sku}
-                                        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                                        className="input-field"
-                                        placeholder="LAPTOP-001"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="input-field"
-                                    rows="3"
-                                    required
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Selling Price ($)</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        value={formData.price}
-                                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                        className="input-field"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Cost Price ($)</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        value={formData.costPrice}
-                                        onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
-                                        className="input-field"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                                    <select
-                                        value={formData.categoryId}
-                                        onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                        className="input-field"
-                                        required
-                                    >
-                                        <option value="">Select a category</option>
-                                        {categories.map((cat) => (
-                                            <option key={cat.categoryId} value={cat.categoryId}>
-                                                {cat.categoryName || cat.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
-                                    <input
-                                        type="text"
-                                        value={formData.brand}
-                                        onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                                        className="input-field"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Initial Stock</label>
-                                    <input
-                                        type="number"
-                                        value={formData.initialStock}
-                                        onChange={(e) => setFormData({ ...formData, initialStock: e.target.value })}
-                                        className="input-field"
-                                        disabled={editingProduct}
-                                        placeholder={editingProduct ? "Manage via Inventory" : "0"}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-                                    <input
-                                        type="text"
-                                        value={formData.imageUrl}
-                                        onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                                        className="input-field"
-                                    />
-                                </div>
-                            </div>
+                            {/* Helper function to render field errors */}
+                            {(() => {
+                                const renderFieldError = (fieldName) => {
+                                    return formErrors[fieldName] ? (
+                                        <p className="text-red-600 text-sm mt-1">{formErrors[fieldName]}</p>
+                                    ) : null;
+                                };
+                                
+                                return (
+                                    <>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Product Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.productName}
+                                                    onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
+                                                    className={`input-field ${formErrors.productName ? 'border-red-500' : ''}`}
+                                                    required
+                                                />
+                                                {renderFieldError('productName')}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">SKU</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.sku}
+                                                    onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                                                    className={`input-field ${formErrors.sku ? 'border-red-500' : ''}`}
+                                                    placeholder="LAPTOP-001"
+                                                    required
+                                                />
+                                                {renderFieldError('sku')}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                            <textarea
+                                                value={formData.description}
+                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                className={`input-field ${formErrors.description ? 'border-red-500' : ''}`}
+                                                rows="3"
+                                                required
+                                            />
+                                            {renderFieldError('description')}
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Selling Price ($)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    value={formData.price}
+                                                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                                    className={`input-field ${formErrors.price ? 'border-red-500' : ''}`}
+                                                    required
+                                                />
+                                                {renderFieldError('price')}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Cost Price ($)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    value={formData.costPrice}
+                                                    onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
+                                                    className={`input-field ${formErrors.costPrice ? 'border-red-500' : ''}`}
+                                                />
+                                                {renderFieldError('costPrice')}
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                                <select
+                                                    value={formData.categoryId}
+                                                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                                                    className={`input-field ${formErrors.categoryId ? 'border-red-500' : ''}`}
+                                                    required
+                                                >
+                                                    <option value="">Select a category</option>
+                                                    {categories.map((cat) => (
+                                                        <option key={cat.categoryId} value={cat.categoryId}>
+                                                            {cat.categoryName || cat.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                {renderFieldError('categoryId')}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.brand}
+                                                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                                                    className={`input-field ${formErrors.brand ? 'border-red-500' : ''}`}
+                                                />
+                                                {renderFieldError('brand')}
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Initial Stock</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.initialStock}
+                                                    onChange={(e) => setFormData({ ...formData, initialStock: e.target.value })}
+                                                    className={`input-field ${formErrors.initialStock ? 'border-red-500' : ''}`}
+                                                    disabled={editingProduct}
+                                                    placeholder={editingProduct ? "Manage via Inventory" : "0"}
+                                                />
+                                                {renderFieldError('initialStock')}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.imageUrl}
+                                                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                                                    className={`input-field ${formErrors.imageUrl ? 'border-red-500' : ''}`}
+                                                />
+                                                {renderFieldError('imageUrl')}
+                                            </div>
+                                        </div>
+                                    </>
+                                );
+                            })()}
 
                             <div className="flex gap-3 pt-4">
                                 <button type="submit" className="btn-primary flex-1">

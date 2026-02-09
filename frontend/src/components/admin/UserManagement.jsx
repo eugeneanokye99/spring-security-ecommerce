@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAllUsers, deleteUser } from '../../services/userService';
 import { Trash2, Shield, User } from 'lucide-react';
+import { showErrorAlert } from '../../utils/errorHandler';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);

@@ -238,35 +238,107 @@ public class GlobalExceptionHandler {
 
     
     /**
+     * Handles AuthenticationException - when user credentials are invalid.
+     * Returns 401 Unauthorized.
+     * Example: Invalid username/password, expired session, etc.
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAuthentication(AuthenticationException ex) {
+        logger.warn("Authentication failed: {}", ex.getMessage());
+        
+        ErrorDetail error = new ErrorDetail(
+                "credentials",
+                ex.getMessage(),
+                ex.getErrorCode()
+        );
+        
+        ApiResponse<Object> response = ApiResponse.error(ex.getMessage(), error);
+        
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+    
+    /**
+     * Handles general BusinessException - business rule violations.
+     * Returns 400 Bad Request.
+     * This is a catch-all for business exceptions that don't have specific handlers.
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBusinessException(BusinessException ex) {
+        logger.warn("Business exception: {}", ex.getMessage());
+        
+        ErrorDetail error = new ErrorDetail(
+                ex.getMessage(),
+                ex.getErrorCode()
+        );
+        
+        ApiResponse<Object> response = ApiResponse.error(ex.getMessage(), error);
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+    
+    /**
      * Handles database constraint violations (unique constraints, foreign key violations, etc.).
-     * Returns 409 Conflict.
-     * Example: Violating unique email constraint
+     * Returns 409 Conflict for constraint violations, 400 for deletion restrictions.
+     * Example: Violating unique email constraint, trying to delete referenced records
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<Object>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         logger.error("Data integrity violation: {}", ex.getMessage());
         
         String message = "Data integrity violation. This operation conflicts with existing data.";
+        String errorCode = "DATA_INTEGRITY_VIOLATION";
+        HttpStatus status = HttpStatus.CONFLICT;
         
         // Try to provide more specific message based on constraint violation
         if (ex.getMessage() != null) {
-            if (ex.getMessage().contains("unique") || ex.getMessage().contains("duplicate")) {
+            String errorMsg = ex.getMessage().toLowerCase();
+            
+            if (errorMsg.contains("unique") || errorMsg.contains("duplicate")) {
                 message = "A record with this value already exists. Please use a unique value.";
-            } else if (ex.getMessage().contains("foreign key")) {
-                message = "Referenced resource does not exist. Please check your input.";
-            } else if (ex.getMessage().contains("not-null")) {
+                errorCode = "DUPLICATE_VALUE";
+                
+            } else if (errorMsg.contains("foreign key") && errorMsg.contains("restrict")) {
+                // Handle foreign key RESTRICT violations (cannot delete because referenced)
+                if (errorMsg.contains("order_items") && errorMsg.contains("product")) {
+                    message = "Cannot delete this product because it is part of existing customer orders. " +
+                             "Products that have been ordered cannot be removed for order history integrity.";
+                    errorCode = "PRODUCT_IN_ORDERS";
+                } else if (errorMsg.contains("order") && errorMsg.contains("customer")) {
+                    message = "Cannot delete this customer because they have existing orders. " +
+                             "Customers with order history cannot be removed.";
+                    errorCode = "CUSTOMER_HAS_ORDERS";
+                } else if (errorMsg.contains("products") && errorMsg.contains("category")) {
+                    message = "Cannot delete this category because it contains products. " +
+                             "Please move or delete all products in this category first.";
+                    errorCode = "CATEGORY_HAS_PRODUCTS";
+                } else {
+                    message = "Cannot delete this record because it is referenced by other data. " +
+                             "Please check for related records that depend on this item.";
+                    errorCode = "REFERENCED_RECORD";
+                }
+                status = HttpStatus.BAD_REQUEST; // Use 400 for deletion restrictions
+                
+            } else if (errorMsg.contains("foreign key")) {
+                message = "Invalid reference. The specified related record does not exist.";
+                errorCode = "INVALID_REFERENCE";
+                status = HttpStatus.BAD_REQUEST;
+                
+            } else if (errorMsg.contains("not-null") || errorMsg.contains("null")) {
                 message = "Required field is missing. Please provide all required fields.";
+                errorCode = "MISSING_REQUIRED_FIELD";
+                status = HttpStatus.BAD_REQUEST;
             }
         }
         
         ErrorDetail error = new ErrorDetail(
                 message,
-                "DATA_INTEGRITY_VIOLATION"
+                errorCode
         );
         
-        ApiResponse<Object> response = ApiResponse.conflict(message, error);
+        ApiResponse<Object> response = status == HttpStatus.BAD_REQUEST ? 
+                ApiResponse.error(message, error) : ApiResponse.conflict(message, error);
         
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(status).body(response);
     }
     
     /**

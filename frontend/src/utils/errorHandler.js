@@ -80,9 +80,10 @@ export const isErrorType = (error, errorCode) => {
  */
 export const isValidationError = (error) => isErrorType(error, 'VALIDATION_ERROR');
 export const isNotFoundError = (error) => isErrorType(error, 'NOT_FOUND');
-export const isUnauthorizedError = (error) => isErrorType(error, 'UNAUTHORIZED');
+export const isUnauthorizedError = (error) => isErrorType(error, 'UNAUTHORIZED') || isErrorType(error, 'AUTHENTICATION_FAILED');
 export const isDuplicateError = (error) => isErrorType(error, 'DUPLICATE_ENTRY');
 export const isInsufficientStockError = (error) => isErrorType(error, 'INSUFFICIENT_STOCK');
+export const isAuthenticationError = (error) => isErrorType(error, 'AUTHENTICATION_FAILED');
 
 /**
  * Network error handler

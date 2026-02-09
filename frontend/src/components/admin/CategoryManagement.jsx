@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAllCategories, createCategory, updateCategory, deleteCategory } from '../../services/categoryService';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-
+import { Plus, Edit, Trash2 } from 'lucide-react';import { showErrorAlert, formatErrorMessage, extractFieldErrors, isValidationError } from '../../utils/errorHandler';
 const CategoryManagement = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);

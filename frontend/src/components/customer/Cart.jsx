@@ -26,7 +26,12 @@ const Cart = () => {
             setCartItems(itemsResponse.data || []);
             setTotal(totalResponse.data || 0);
         } catch (error) {
-            console.error('Error loading cart:', error);
+            console.error('Error loading cart:', error);            
+            if (isInsufficientStockError(error)) {
+                showErrorAlert(error, 'Not enough stock available for this item');
+            } else {
+                showErrorAlert(error, 'Failed to update cart item');
+            }            showErrorAlert(error, 'Failed to load cart items');
         } finally {
             setLoading(false);
         }

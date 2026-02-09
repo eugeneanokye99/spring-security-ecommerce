@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerUser } from '../services/userService';
 import { ShoppingBag, User, Mail, Lock, Phone as PhoneIcon, AlertCircle, CheckCircle } from 'lucide-react';
+import { formatErrorMessage, extractFieldErrors, isValidationError, isDuplicateError } from '../utils/errorHandler';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const Register = () => {
         userType: 'CUSTOMER' // Default to customer
     });
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -28,6 +30,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setFieldErrors({});
         setLoading(true);
 
         try {
@@ -37,7 +40,22 @@ const Register = () => {
                 navigate('/login');
             }, 3000);
         } catch (err) {
-            setError(err.message || 'Registration failed. Please try again.');
+            console.error('Registration error:', err);
+            
+            if (isValidationError(err)) {
+                const fieldErrs = extractFieldErrors(err);
+                setFieldErrors(fieldErrs);
+                
+                if (Object.keys(fieldErrs).length === 0) {
+                    setError(formatErrorMessage(err, true));
+                } else {
+                    setError('Please fix the highlighted fields.');
+                }
+            } else if (isDuplicateError(err)) {
+                setError('Username or email already exists. Please choose different values.');
+            } else {
+                setError(formatErrorMessage(err, true) || 'Registration failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -96,10 +114,13 @@ const Register = () => {
                                         type="text"
                                         value={formData.username}
                                         onChange={handleChange}
-                                        className="input-field pl-10"
+                                        className={`input-field pl-10 ${fieldErrors.username ? 'border-red-500' : ''}`}
                                         placeholder="johndoe"
                                         required
                                     />
+                                    {fieldErrors.username && (
+                                        <p className="text-red-600 text-sm mt-1">{fieldErrors.username}</p>
+                                    )}
                                 </div>
                             </div>
 
