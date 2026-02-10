@@ -59,6 +59,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional()
+    @Auditable(action = "USER_REGISTRATION", description = "Registering new user with specific type")
+    public UserResponse registerUser(CreateUserRequest request, UserType userType) {
+        validateCreateUserRequest(request);
+
+        if (userRepository.usernameExists(request.getUsername())) {
+            throw new DuplicateResourceException("User", "username", request.getUsername());
+        }
+
+        if (userRepository.emailExists(request.getEmail())) {
+            throw new DuplicateResourceException("User", "email", request.getEmail());
+        }
+
+        // Use the mapper method that accepts userType parameter
+        User user = userMapper.toUser(request, userType);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        User createdUser = userRepository.save(user);
+
+        return userMapper.toUserResponse(createdUser);
+    }
+
+    @Override
     public UserResponse authenticateUser(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
             throw new ValidationException("Username cannot be empty");

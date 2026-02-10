@@ -36,6 +36,20 @@ public interface UserMapperStruct {
     User toUser(CreateUserRequest request);
 
     /**
+     * Maps CreateUserRequest to User entity with specific user type.
+     * 
+     * @param request the create user request
+     * @param userType the user type to assign
+     * @return the mapped user entity
+     */
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "passwordHash", source = "request.password")
+    @Mapping(target = "userType", source = "userType")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    User toUser(CreateUserRequest request, UserType userType);
+
+    /**
      * Maps User entity to UserResponse.
      * Password is never included in response for security.
      * 

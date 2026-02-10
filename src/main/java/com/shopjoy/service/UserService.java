@@ -22,6 +22,7 @@ public interface UserService {
      * Registers a new user in the system.
      * Validates that username and email are unique before creating the account.
      * Hashes the password before storing it.
+     * User type defaults to CUSTOMER.
      * 
      * @param request the user registration request DTO
      * @return the created user response DTO
@@ -29,6 +30,19 @@ public interface UserService {
      * @throws ValidationException if user data is invalid
      */
     UserResponse registerUser(CreateUserRequest request);
+    
+    /**
+     * Registers a new user in the system with a specific user type.
+     * Validates that username and email are unique before creating the account.
+     * Hashes the password before storing it.
+     * 
+     * @param request the user registration request DTO
+     * @param userType the user type to assign (CUSTOMER or ADMIN)
+     * @return the created user response DTO
+     * @throws DuplicateResourceException if username or email already exists
+     * @throws ValidationException if user data is invalid
+     */
+    UserResponse registerUser(CreateUserRequest request, UserType userType);
     
     /**
      * Authenticates a user with username and plain text password.
