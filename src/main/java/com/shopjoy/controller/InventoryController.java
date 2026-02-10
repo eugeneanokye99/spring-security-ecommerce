@@ -66,6 +66,31 @@ public class InventoryController {
     }
 
     /**
+     * Gets inventory for multiple products in batch.
+     *
+     * @param productIds the product ids
+     * @return the batch inventory
+     */
+    @Operation(
+            summary = "Get product inventory in batch",
+            description = "Retrieves inventory information for multiple products in a single request"
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Inventory retrieved successfully",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    @GetMapping("/products/batch")
+    public ResponseEntity<ApiResponse<List<InventoryResponse>>> getInventoryBatch(
+            @Parameter(description = "List of product IDs", required = true, example = "1,2,3")
+            @RequestParam List<Integer> productIds) {
+        List<InventoryResponse> response = inventoryService.getInventoryByProducts(productIds);
+        return ResponseEntity.ok(ApiResponse.success(response, "Batch inventory retrieved successfully"));
+    }
+
+    /**
      * Is product in stock response entity.
      *
      * @param productId the product id

@@ -27,7 +27,7 @@ public class Address implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id")
-    private int addressId;
+    private Integer addressId;
 
     @Column(name = "user_id", nullable = false)
     private int userId;
@@ -36,7 +36,6 @@ public class Address implements Serializable {
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "address_type", length = 20)
     private AddressType addressType;
 

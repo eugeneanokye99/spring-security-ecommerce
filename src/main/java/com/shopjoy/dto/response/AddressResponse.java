@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AddressResponse {
     
-    private int addressId;
-    private int userId;
+    private Integer addressId;
+    private Integer userId;
     private AddressType addressType;
     private String streetAddress;
     private String city;

@@ -16,10 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReviewResponse {
     
-    private int reviewId;
-    private int userId;
+    private Integer reviewId;
+    private Integer userId;
     private String userName;
-    private int productId;
+    private Integer productId;
     private String productName;
     private int rating;
     private String title;

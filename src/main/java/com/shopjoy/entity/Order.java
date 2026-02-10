@@ -30,7 +30,7 @@ public class Order implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
-    private int orderId;
+    private Integer orderId;
 
     @Column(name = "user_id", nullable = false)
     private int userId;
@@ -45,7 +45,6 @@ public class Order implements Serializable {
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20)
     private OrderStatus status;
 
@@ -55,7 +54,6 @@ public class Order implements Serializable {
     @Column(name = "payment_method", length = 50)
     private String paymentMethod;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", length = 20)
     private PaymentStatus paymentStatus;
 

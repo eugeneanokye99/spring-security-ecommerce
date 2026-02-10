@@ -27,7 +27,7 @@ public class Inventory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inventory_id")
-    private int inventoryId;
+    private Integer inventoryId;
 
     @Column(name = "product_id", unique = true, nullable = false)
     private int productId;

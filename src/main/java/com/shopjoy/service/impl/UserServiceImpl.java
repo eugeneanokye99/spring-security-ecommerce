@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapperStruct userMapper;
 
     @Override
-    @Transactional()
+    @Transactional(readOnly = false)
     @Auditable(action = "USER_REGISTRATION", description = "Registering new user")
     public UserResponse registerUser(CreateUserRequest request) {
         validateCreateUserRequest(request);
@@ -50,16 +50,18 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userMapper.toUser(request);
+        // Hash the password with BCrypt before saving
+        user.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
-        User createdUser = userRepository.save(user);
+        User createdUser = userRepository.saveAndFlush(user);
 
         return userMapper.toUserResponse(createdUser);
     }
 
     @Override
-    @Transactional()
+    @Transactional(readOnly = false)
     @Auditable(action = "USER_REGISTRATION", description = "Registering new user with specific type")
     public UserResponse registerUser(CreateUserRequest request, UserType userType) {
         validateCreateUserRequest(request);
@@ -74,10 +76,12 @@ public class UserServiceImpl implements UserService {
 
         // Use the mapper method that accepts userType parameter
         User user = userMapper.toUser(request, userType);
+        // Hash the password with BCrypt before saving
+        user.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
-        User createdUser = userRepository.save(user);
+        User createdUser = userRepository.saveAndFlush(user);
 
         return userMapper.toUserResponse(createdUser);
     }
@@ -92,13 +96,20 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("Password cannot be empty");
         }
 
-        Optional<User> userOpt = userRepository.authenticate(username, password);
+        Optional<User> userOpt = userRepository.findByUsername(username);
 
         if (userOpt.isEmpty()) {
             throw new AuthenticationException();
         }
 
-        return userMapper.toUserResponse(userOpt.get());
+        User user = userOpt.get();
+        
+        // Verify password using BCrypt
+        if (!BCrypt.checkpw(password, user.getPasswordHash())) {
+            throw new AuthenticationException();
+        }
+
+        return userMapper.toUserResponse(user);
     }
 
     @Override
@@ -172,7 +183,9 @@ public class UserServiceImpl implements UserService {
 
         validatePassword(newPassword);
 
-        userRepository.changePassword(userId, newPassword);
+        // Hash the new password before saving
+        String hashedNewPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        userRepository.changePassword(userId, hashedNewPassword);
     }
 
     @Override

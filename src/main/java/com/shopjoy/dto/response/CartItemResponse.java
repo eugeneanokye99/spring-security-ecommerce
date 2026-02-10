@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CartItemResponse {
     
-    private int cartItemId;
-    private int userId;
-    private int productId;
+    private Integer cartItemId;
+    private Integer userId;
+    private Integer productId;
     private String productName;
     private double productPrice;
     private int quantity;

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class ProductResponse {
 
     @Schema(description = "Product unique identifier", example = "1")
-    private int productId;
+    private Integer productId;
 
     @Schema(description = "Product name", example = "Dell XPS 15 Laptop")
     private String productName;
@@ -25,7 +25,7 @@ public class ProductResponse {
     private String description;
 
     @Schema(description = "Category unique identifier", example = "1")
-    private int categoryId;
+    private Integer categoryId;
 
     @Schema(description = "Category name", example = "Electronics")
     private String categoryName;

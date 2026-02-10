@@ -41,32 +41,37 @@ export const getOutOfStockProducts = () => api.get('/inventory/out-of-stock');
 export const updateReorderLevel = (productId, reorderLevel) =>
     api.patch(`/inventory/product/${productId}/reorder-level`, null, { params: { reorderLevel } });
 
+// GET /api/v1/inventory/products/batch?productIds={ids} - Get inventory for multiple products
+export const getInventoryBatch = (productIds) => 
+    api.get('/inventory/products/batch', { params: { productIds: productIds.join(',') } });
+
 // GET all inventory items (combines with product service)
 export const getAllInventoryItems = async () => {
     const products = await getAllProducts();
-    const inventoryItems = await Promise.all(
-        products.data.map(async (product) => {
-            try {
-                const inventory = await getInventory(product.product_id || product.productId || product.id);
-                return {
-                    ...product,
-                    productId: product.product_id || product.productId || product.id,
-                    productName: product.product_name || product.productName || product.name,
-                    stockQuantity: inventory.data?.stockQuantity || 0,
-                    reorderLevel: inventory.data?.reorderLevel || 10,
-                    reservedQuantity: inventory.data?.reservedQuantity || 0
-                };
-            } catch (error) {
-                return {
-                    ...product,
-                    productId: product.product_id || product.productId || product.id,
-                    productName: product.product_name || product.productName || product.name,
-                    stockQuantity: 0,
-                    reorderLevel: 10,
-                    reservedQuantity: 0
-                };
-            }
-        })
-    );
+    const productIds = products.data.map(p => p.product_id || p.productId || p.id);
+    
+    let inventoryMap = {};
+    try {
+        const inventoryResponse = await getInventoryBatch(productIds);
+        inventoryMap = (inventoryResponse.data || []).reduce((acc, inv) => {
+            acc[inv.productId] = inv;
+            return acc;
+        }, {});
+    } catch (error) {
+        console.error('Error fetching batch inventory:', error);
+    }
+
+    const inventoryItems = products.data.map(product => {
+        const productId = product.product_id || product.productId || product.id;
+        const inventory = inventoryMap[productId];
+        return {
+            ...product,
+            productId,
+            productName: product.product_name || product.productName || product.name,
+            stockQuantity: inventory?.stockQuantity || inventory?.quantityInStock || 0,
+            reorderLevel: inventory?.reorderLevel || 10,
+            reservedQuantity: inventory?.reservedQuantity || 0
+        };
+    });
     return { data: inventoryItems };
 };

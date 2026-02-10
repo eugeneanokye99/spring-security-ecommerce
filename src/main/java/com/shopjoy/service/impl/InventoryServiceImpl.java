@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -176,17 +177,15 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public List<InventoryResponse> getLowStockProducts() {
-        return inventoryRepository.findLowStock().stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(inventoryRepository.findLowStock());
     }
 
     @Override
     public List<InventoryResponse> getOutOfStockProducts() {
-        return inventoryRepository.findAll().stream()
+        List<Inventory> outOfStock = inventoryRepository.findAll().stream()
                 .filter(inventory -> inventory.getQuantityInStock() == 0)
-                .map(this::convertToResponse)
                 .toList();
+        return convertToResponses(outOfStock);
     }
 
     @Override
@@ -204,6 +203,15 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory updatedInventory = inventoryRepository.save(inventory);
 
         return convertToResponse(updatedInventory);
+    }
+
+    @Override
+    public List<InventoryResponse> getInventoryByProducts(List<Integer> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return List.of();
+        }
+        List<Inventory> inventories = inventoryRepository.findByProductIdIn(productIds);
+        return convertToResponses(inventories);
     }
 
     private void validateInventoryData(Inventory inventory) {
@@ -234,5 +242,30 @@ public class InventoryServiceImpl implements InventoryService {
             // Ignore product fetch errors
         }
         return inventoryMapper.toInventoryResponse(inventory, productName);
+    }
+
+    /**
+     * Batch converts inventories to responses, fetching products in bulk.
+     */
+    private List<InventoryResponse> convertToResponses(List<Inventory> inventories) {
+        if (inventories.isEmpty()) {
+            return List.of();
+        }
+        
+        // Fetch all products in one query
+        List<Integer> productIds = inventories.stream()
+                .map(Inventory::getProductId)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Integer, String> productNameMap = productRepository.findAllById(productIds).stream()
+                .collect(Collectors.toMap(
+                        com.shopjoy.entity.Product::getProductId,
+                        com.shopjoy.entity.Product::getProductName));
+        
+        return inventories.stream()
+                .map(inventory -> inventoryMapper.toInventoryResponse(
+                        inventory,
+                        productNameMap.getOrDefault(inventory.getProductId(), "Unknown Product")))
+                .collect(Collectors.toList());
     }
 }

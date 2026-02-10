@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class InventoryResponse {
 
-    private int inventoryId;
-    private int productId;
+    private Integer inventoryId;
+    private Integer productId;
     private String productName;
     private int stockQuantity;
     private int reorderLevel;

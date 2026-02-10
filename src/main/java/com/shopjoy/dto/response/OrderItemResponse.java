@@ -16,10 +16,10 @@ import lombok.Setter;
 public class OrderItemResponse {
 
     @Schema(description = "Order item unique identifier", example = "1")
-    private int orderItemId;
+    private Integer orderItemId;
 
     @Schema(description = "Product unique identifier", example = "101")
-    private int productId;
+    private Integer productId;
 
     @Schema(description = "Product name", example = "Dell XPS 15")
     private String productName;

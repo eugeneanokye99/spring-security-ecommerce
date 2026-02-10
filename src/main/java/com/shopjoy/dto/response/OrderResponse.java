@@ -21,10 +21,10 @@ import java.util.List;
 public class OrderResponse {
 
     @Schema(description = "Order unique identifier", example = "1")
-    private int orderId;
+    private Integer orderId;
 
     @Schema(description = "User ID who placed the order", example = "1")
-    private int userId;
+    private Integer userId;
 
     @Schema(description = "User's full name", example = "John Doe")
     private String userName;

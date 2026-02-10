@@ -131,4 +131,12 @@ public interface InventoryService {
      * @throws ValidationException if reorder level is invalid
      */
     InventoryResponse updateReorderLevel(Integer productId, int reorderLevel);
+
+    /**
+     * Retrieves inventory for multiple products in a single batch.
+     * 
+     * @param productIds the list of product IDs
+     * @return list of inventory responses
+     */
+    List<InventoryResponse> getInventoryByProducts(List<Integer> productIds);
 }

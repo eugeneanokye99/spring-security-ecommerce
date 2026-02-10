@@ -28,4 +28,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
     
     @Query("SELECT i FROM Inventory i WHERE i.quantityInStock <= i.reorderLevel")
     List<Inventory> findLowStock();
+    
+    @Query("SELECT i FROM Inventory i WHERE i.productId IN :productIds")
+    List<Inventory> findByProductIdIn(@Param("productIds") List<Integer> productIds);
 }

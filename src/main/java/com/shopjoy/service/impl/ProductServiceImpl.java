@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +49,61 @@ public class ProductServiceImpl implements ProductService {
                 .map(com.shopjoy.entity.Inventory::getQuantityInStock)
                 .orElse(0);
         return productMapper.toProductResponse(product, categoryName, stock);
+    }
+
+    /**
+     * Converts database column names (snake_case) to Java field names (camelCase).
+     */
+    private String normalizeFieldName(String fieldName) {
+        if (fieldName == null) {
+            return "productId";
+        }
+        return switch (fieldName) {
+            case "product_id" -> "productId";
+            case "product_name" -> "productName";
+            case "category_id" -> "categoryId";
+            case "cost_price" -> "costPrice";
+            case "image_url" -> "imageUrl";
+            case "is_active" -> "active";
+            case "created_at" -> "createdAt";
+            case "updated_at" -> "updatedAt";
+            default -> fieldName;
+        };
+    }
+
+    /**
+     * Batch converts products to responses, fetching categories and inventories in bulk.
+     */
+    private List<ProductResponse> convertToResponses(List<Product> products) {
+        if (products.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        // Fetch all categories in one query
+        List<Integer> categoryIds = products.stream()
+                .map(Product::getCategoryId)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Integer, String> categoryMap = categoryRepository.findAllById(categoryIds).stream()
+                .collect(Collectors.toMap(
+                        com.shopjoy.entity.Category::getCategoryId,
+                        com.shopjoy.entity.Category::getCategoryName));
+        
+        // Fetch all inventories in one query
+        List<Integer> productIds = products.stream()
+                .map(Product::getProductId)
+                .collect(Collectors.toList());
+        Map<Integer, Integer> inventoryMap = inventoryRepository.findByProductIdIn(productIds).stream()
+                .collect(Collectors.toMap(
+                        com.shopjoy.entity.Inventory::getProductId,
+                        com.shopjoy.entity.Inventory::getQuantityInStock));
+        
+        return products.stream()
+                .map(product -> productMapper.toProductResponse(
+                        product,
+                        categoryMap.getOrDefault(product.getCategoryId(), "Unknown"),
+                        inventoryMap.getOrDefault(product.getProductId(), 0)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -83,17 +139,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(productRepository.findAll());
     }
 
     @Override
     public List<ProductResponse> getActiveProducts() {
-        return productRepository.findAll().stream()
+        List<Product> activeProducts = productRepository.findAll().stream()
                 .filter(Product::isActive)
-                .map(this::convertToResponse)
                 .collect(Collectors.toList());
+        return convertToResponses(activeProducts);
     }
 
     @Override
@@ -101,9 +155,7 @@ public class ProductServiceImpl implements ProductService {
         if (categoryId == null) {
             throw new ValidationException("Category ID cannot be null");
         }
-        return productRepository.findByCategoryId(categoryId).stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(productRepository.findByCategoryId(categoryId));
     }
 
     @Override
@@ -111,9 +163,7 @@ public class ProductServiceImpl implements ProductService {
         if (keyword == null || keyword.trim().isEmpty()) {
             throw new ValidationException("Search keyword cannot be empty");
         }
-        return productRepository.findByNameContaining(keyword).stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(productRepository.findByNameContaining(keyword));
     }
 
     @Override
@@ -124,9 +174,7 @@ public class ProductServiceImpl implements ProductService {
         if (maxPrice < minPrice) {
             throw new ValidationException("Maximum price must be greater than or equal to minimum price");
         }
-        return productRepository.findByPriceRange(minPrice, maxPrice).stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(productRepository.findByPriceRange(minPrice, maxPrice));
     }
 
     @Override
@@ -211,14 +259,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponse> getProductsPaginated(Pageable pageable, String sortBy, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection != null ? sortDirection : "ASC"), 
-                           sortBy != null ? sortBy : "productId");
+                           normalizeFieldName(sortBy));
         PageRequest pageRequest = PageRequest.of(pageable.getPage(), pageable.getSize(), sort);
         
         org.springframework.data.domain.Page<Product> productPage = productRepository.findAll(pageRequest);
 
-        List<ProductResponse> responseList = productPage.getContent().stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        List<ProductResponse> responseList = convertToResponses(productPage.getContent());
 
         return new Page<>(
                 responseList,
@@ -236,9 +282,7 @@ public class ProductServiceImpl implements ProductService {
         PageRequest pageRequest = PageRequest.of(pageable.getPage(), pageable.getSize());
         org.springframework.data.domain.Page<Product> productPage = productRepository.searchProducts(keyword, pageRequest);
 
-        List<ProductResponse> responseList = productPage.getContent().stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        List<ProductResponse> responseList = convertToResponses(productPage.getContent());
 
         return new Page<>(
                 responseList,
@@ -263,6 +307,7 @@ public class ProductServiceImpl implements ProductService {
         if (algorithm != null && !algorithm.equalsIgnoreCase("DATABASE")) {
             // Fetch all matching products without pagination
             List<Product> allProducts = productRepository.findAllWithFilters(
+                    filter.getSearchTerm(),
                     filter.getCategoryId(),
                     filter.getMinPrice(),
                     filter.getMaxPrice(),
@@ -289,9 +334,7 @@ public class ProductServiceImpl implements ProductService {
                 pagedContent = allProducts.subList(start, end);
             }
 
-            List<ProductResponse> responseList = pagedContent.stream()
-                    .map(this::convertToResponse)
-                    .collect(Collectors.toList());
+            List<ProductResponse> responseList = convertToResponses(pagedContent);
 
             return new Page<>(
                     responseList,
@@ -302,10 +345,11 @@ public class ProductServiceImpl implements ProductService {
 
         // Default database sorting/pagination
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection != null ? sortDirection : "ASC"), 
-                           sortBy != null ? sortBy : "productId");
+                           normalizeFieldName(sortBy));
         PageRequest pageRequest = PageRequest.of(pageable.getPage(), pageable.getSize(), sort);
         
         org.springframework.data.domain.Page<Product> productPage = productRepository.findWithFilters(
+                filter.getSearchTerm(),
                 filter.getCategoryId(),
                 filter.getMinPrice(),
                 filter.getMaxPrice(),
@@ -313,9 +357,7 @@ public class ProductServiceImpl implements ProductService {
                 filter.getActive(),
                 pageRequest);
 
-        List<ProductResponse> responseList = productPage.getContent().stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        List<ProductResponse> responseList = convertToResponses(productPage.getContent());
 
         return new Page<>(
                 responseList,
@@ -333,9 +375,7 @@ public class ProductServiceImpl implements ProductService {
 
         SortingAlgorithms.quickSort(products, comparator);
 
-        return products.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(products);
     }
 
     @Override
@@ -347,9 +387,7 @@ public class ProductServiceImpl implements ProductService {
 
         SortingAlgorithms.mergeSort(products, comparator);
 
-        return products.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(products);
     }
 
     @Override
@@ -393,9 +431,7 @@ public class ProductServiceImpl implements ProductService {
                 SortingAlgorithms.quickSort(products, comparator);
         }
 
-        return products.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(products);
     }
 
     @Override
@@ -414,9 +450,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getRecentlyAddedProducts(int limit) {
 
-        return productRepository.findRecentlyAdded(PageRequest.of(0, limit)).stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        return convertToResponses(productRepository.findRecentlyAdded(PageRequest.of(0, limit)));
     }
 
     private void validateProductData(Product product) {
