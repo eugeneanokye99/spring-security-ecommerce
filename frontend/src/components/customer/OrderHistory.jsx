@@ -1,51 +1,46 @@
-import { useState, useEffect } from 'react';
-import { getOrdersByUser, cancelOrder, deleteOrder, updateOrder } from '../../services/orderService';
+import { useState } from 'react';
+import { useUserOrders, useUpdateOrderStatus } from '../../services/graphqlService';
 import { useAuth } from '../../context/AuthContext';
 import { Package, Clock, Truck, CheckCircle, XCircle, Trash2, X, Edit, Plus, Minus } from 'lucide-react';
 
 const OrderHistory = () => {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [editingOrder, setEditingOrder] = useState(null);
     const [editForm, setEditForm] = useState({});
+    const [currentPage, setCurrentPage] = useState(0);
     const { user } = useAuth();
+    const pageSize = 20;
 
-    useEffect(() => {
-        if (user) {
-            loadOrders();
-        }
-    }, [user]);
+    const { data, loading, error, refetch } = useUserOrders(user?.userId, currentPage, pageSize);
+    const [updateOrderStatusMutation] = useUpdateOrderStatus();
 
-    const loadOrders = async () => {
-        if (!user) return;
-        try {
-            const response = await getOrdersByUser(user.userId);
-            setOrders(response.data || []);
-            console.log('Orders loaded:', response.data);
-        } catch (error) {
-            console.error('Error loading orders:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const orders = data?.orders?.orders || [];
+    const pageInfo = data?.orders?.pageInfo || {};
 
     const handleCancelOrder = async (orderId) => {
         if (!window.confirm('Are you sure you want to cancel this order?')) return;
         try {
-            await cancelOrder(orderId);
-            loadOrders();
+            await updateOrderStatusMutation({
+                variables: { 
+                    id: orderId.toString(), 
+                    status: 'CANCELLED' 
+                }
+            });
+            // Refetch data to show updated status
+            refetch();
         } catch (error) {
-            alert(error.response?.data?.message || 'Failed to cancel order');
+            const errorMessage = error?.graphQLErrors?.[0]?.message || error.message || 'Failed to cancel order';
+            alert(errorMessage);
         }
     };
 
     const handleDeleteOrder = async (orderId) => {
         if (!window.confirm('Are you sure you want to delete this order?')) return;
         try {
-            await deleteOrder(orderId);
-            loadOrders();
+            // Note: Delete functionality would need to be added to GraphQL schema
+            // For now, we'll just show an alert
+            alert('Delete functionality not available in GraphQL version yet');
         } catch (error) {
-            alert(error.response?.data?.message || 'Failed to delete order');
+            alert(error.message || 'Failed to delete order');
         }
     };
 
@@ -153,6 +148,21 @@ const handleUpdateOrder = async (orderId) => {
         return (
             <div className="flex justify-center py-12">
                 <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center py-12">
+                <div className="text-red-600 mb-4">Error loading order history:</div>
+                <p className="text-gray-500 mb-4">{error.message}</p>
+                <button 
+                    onClick={refetch}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                >
+                    Try Again
+                </button>
             </div>
         );
     }

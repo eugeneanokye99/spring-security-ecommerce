@@ -241,6 +241,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponse> getProductsWithFilters(ProductFilter filter, Pageable pageable, String sortBy,
             String sortDirection, String algorithm) {
+        // Handle null filter by creating an empty one
+        if (filter == null) {
+            filter = ProductFilter.builder().build();
+        }
+        
         if (filter.getMinPrice() != null && filter.getMaxPrice() != null &&
                 filter.getMinPrice() > filter.getMaxPrice()) {
             throw new ValidationException("minPrice", "must be less than or equal to maxPrice");

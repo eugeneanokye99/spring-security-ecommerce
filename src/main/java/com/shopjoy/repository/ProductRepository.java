@@ -264,6 +264,11 @@ public class ProductRepository implements IProductRepository {
     }
 
     private void buildFilterConditions(StringBuilder sql, ProductFilter filter, List<Object> params) {
+        // Handle null filter
+        if (filter == null) {
+            return;
+        }
+        
         if (filter.getMinPrice() != null) {
             sql.append(" AND price >= ?");
             params.add(filter.getMinPrice());

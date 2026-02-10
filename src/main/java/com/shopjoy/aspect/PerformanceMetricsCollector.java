@@ -1,7 +1,5 @@
 package com.shopjoy.aspect;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -9,8 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class PerformanceMetricsCollector {
-    
-    private static final Logger logger = LoggerFactory.getLogger(PerformanceMetricsCollector.class);
     
     private final Map<String, List<Long>> metrics = new ConcurrentHashMap<>();
     private final Map<String, Long> callCounts = new ConcurrentHashMap<>();

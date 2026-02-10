@@ -39,6 +39,22 @@ type Order {
     status: String!
     paymentStatus: String!
     orderDate: DateTime!
+    shippingAddress: String
+    paymentMethod: String
+    notes: String
+    orderItems: [OrderItem]
+}
+
+type OrderItem {
+    orderItemId: Int!
+    orderId: Int!
+    productId: Int!
+    product: Product
+    productName: String!
+    quantity: Int!
+    unitPrice: Float!
+    subtotal: Float!
+    createdAt: DateTime!
 }
 
 type CartItem {

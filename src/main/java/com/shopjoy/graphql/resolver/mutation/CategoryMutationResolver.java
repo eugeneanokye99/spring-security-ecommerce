@@ -3,23 +3,20 @@ package com.shopjoy.graphql.resolver.mutation;
 import com.shopjoy.dto.response.CategoryResponse;
 import com.shopjoy.graphql.input.CreateCategoryInput;
 import com.shopjoy.graphql.input.UpdateCategoryInput;
-import com.shopjoy.graphql.mapper.GraphQLMapper;
+import com.shopjoy.dto.mapper.GraphQLMapperStruct;
 import com.shopjoy.service.CategoryService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
+@AllArgsConstructor
 public class CategoryMutationResolver {
 
     private final CategoryService categoryService;
-    private final GraphQLMapper graphQLMapper;
-
-    public CategoryMutationResolver(CategoryService categoryService, GraphQLMapper graphQLMapper) {
-        this.categoryService = categoryService;
-        this.graphQLMapper = graphQLMapper;
-    }
+    private final GraphQLMapperStruct graphQLMapper;
 
     @MutationMapping
     public CategoryResponse createCategory(@Argument @Valid CreateCategoryInput input) {

@@ -3,7 +3,6 @@ spring:
     name: shopjoy-ecommerce-system
   
   graphql:
-    path: /graphql
     graphiql:
       enabled: true
       path: /graphiql
@@ -16,3 +15,5 @@ spring:
       allowed-origins: "*"
       allowed-methods: "*"
       allowed-headers: "*"
+    http:
+      path: /graphql

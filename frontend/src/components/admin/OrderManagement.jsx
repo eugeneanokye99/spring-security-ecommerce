@@ -1,51 +1,38 @@
 import { useState, useEffect } from 'react';
-import { getAllOrders, updateOrderStatus, confirmOrder, shipOrder, completeOrder, cancelOrder } from '../../services/orderService';
+import { useAllOrders, useUpdateOrderStatus } from '../../services/graphqlService';
 import { Package, Clock, Truck, CheckCircle, XCircle, Search, Eye, Filter, MapPin, CreditCard, User, ShoppingBag } from 'lucide-react';
 import { showErrorAlert } from '../../utils/errorHandler';
 
 const OrderManagement = () => {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [expandedOrder, setExpandedOrder] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const pageSize = 20;
+
+    const { data, loading, error, refetch } = useAllOrders(currentPage, pageSize);
+    const [updateOrderStatusMutation] = useUpdateOrderStatus();
+
+    const orders = data?.orders?.orders || [];
+    const pageInfo = data?.orders?.pageInfo || {};
 
     useEffect(() => {
-        loadOrders();
-    }, []);
+        refetch();
+    }, [currentPage, refetch]);
 
-    const loadOrders = async () => {
+    const handleStatusChange = async (orderId, newStatus) => {
         try {
-            setLoading(true);
-            const response = await getAllOrders();
-            setOrders(response.data || []);
-        } catch (error) {
-            console.error('Error loading orders:', error);
-            showErrorAlert(error, 'Failed to load orders');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleStatusChange = async (orderId, action) => {
-        try {
-            switch (action) {
-                case 'confirm':
-                    await confirmOrder(orderId);
-                    break;
-                case 'ship':
-                    await shipOrder(orderId);
-                    break;
-                case 'complete':
-                    await completeOrder(orderId);
-                    break;
-                case 'cancel':
-                    await cancelOrder(orderId);
-                    break;
-            }
-            loadOrders();
+            await updateOrderStatusMutation({
+                variables: { 
+                    id: orderId.toString(), 
+                    status: newStatus 
+                }
+            });
+            // Refetch data to show updated status and avoid state mismatches
+            refetch();
         } catch (error) {
             console.error('Error updating order status:', error);
-            showErrorAlert(error, 'Failed to update order status');
+            const errorMessage = error?.graphQLErrors?.[0]?.message || error.message || 'Failed to update order status';
+            showErrorAlert(error, errorMessage);
         }
     };
 
@@ -69,6 +56,21 @@ const OrderManagement = () => {
     const filteredOrders = statusFilter === 'ALL'
         ? orders
         : orders.filter(o => o.status === statusFilter);
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-96">
+                <div className="text-red-600 mb-4">Error loading orders:</div>
+                <p className="text-gray-500 mb-4">{error.message}</p>
+                <button 
+                    onClick={refetch}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -160,7 +162,7 @@ const OrderManagement = () => {
                                                     <User className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
-                                                    <span className="text-sm font-bold text-gray-700 truncate">{order.userName || 'Unknown Customer'}</span>
+                                                    <span className="text-sm font-bold text-gray-700 truncate">{order.user.firstName} {order.user.lastName || 'Unknown Customer'}</span>
                                                     <div className="text-[10px] text-gray-400 font-medium space-y-1">
                                                         <div className="flex items-center gap-1">
                                                             <ShoppingBag className="w-3 h-3" />
@@ -204,7 +206,7 @@ const OrderManagement = () => {
                                             <div className="flex justify-end gap-2">
                                                 {order.status === 'PENDING' && (
                                                     <button
-                                                        onClick={() => handleStatusChange(order.orderId, 'confirm')}
+                                                        onClick={() => handleStatusChange(order.orderId, 'PROCESSING')}
                                                         className="px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
                                                     >
                                                         Accept
@@ -212,7 +214,7 @@ const OrderManagement = () => {
                                                 )}
                                                 {order.status === 'PROCESSING' && (
                                                     <button
-                                                        onClick={() => handleStatusChange(order.orderId, 'ship')}
+                                                        onClick={() => handleStatusChange(order.orderId, 'SHIPPED')}
                                                         className="px-4 py-2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
                                                     >
                                                         Ship Order
@@ -220,7 +222,7 @@ const OrderManagement = () => {
                                                 )}
                                                 {order.status === 'SHIPPED' && (
                                                     <button
-                                                        onClick={() => handleStatusChange(order.orderId, 'complete')}
+                                                        onClick={() => handleStatusChange(order.orderId, 'DELIVERED')}
                                                         className="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100"
                                                     >
                                                         Mark Delivered
@@ -228,7 +230,7 @@ const OrderManagement = () => {
                                                 )}
                                                 {['PENDING', 'PROCESSING'].includes(order.status) && (
                                                     <button
-                                                        onClick={() => handleStatusChange(order.orderId, 'cancel')}
+                                                        onClick={() => handleStatusChange(order.orderId, 'CANCELLED')}
                                                         className="px-4 py-2 bg-white text-rose-600 border border-rose-100 text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-rose-50 transition-all"
                                                     >
                                                         Cancel

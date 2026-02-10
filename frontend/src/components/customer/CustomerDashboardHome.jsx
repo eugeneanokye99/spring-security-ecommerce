@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
     ShoppingBag,
     Package,
@@ -12,38 +11,43 @@ import {
     Clock,
     Target
 } from 'lucide-react';
-import { getUserAnalytics } from '../../services/analyticsService';
+import { useUserAnalytics, transformUserAnalytics } from '../../services/graphqlService';
 import { useAuth } from '../../context/AuthContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const CustomerDashboardHome = () => {
     const { user } = useAuth();
-    const [analytics, setAnalytics] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const { data: rawData, loading, error, refetch } = useUserAnalytics(user?.userId);
 
-    useEffect(() => {
-        if (user) {
-            loadAnalytics();
-        }
-    }, [user]);
-
-    const loadAnalytics = async () => {
-        try {
-            setLoading(true);
-            const response = await getUserAnalytics(user.userId);
-            setAnalytics(response.data);
-        } catch (error) {
-            console.error('Error loading analytics:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading || !analytics) {
+    if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-96">
                 <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p className="text-gray-500 font-medium">Preparing your personalized dashboard...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-96">
+                <div className="text-red-600 mb-4">Error loading dashboard:</div>
+                <p className="text-gray-500 mb-4">{error.message}</p>
+                <button 
+                    onClick={refetch}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                >
+                    Try Again
+                </button>
+            </div>
+        );
+    }
+
+    const analytics = transformUserAnalytics(rawData);
+    if (!analytics) {
+        return (
+            <div className="flex flex-col items-center justify-center h-96">
+                <p className="text-gray-500 font-medium">No data available</p>
             </div>
         );
     }
@@ -126,7 +130,7 @@ const CustomerDashboardHome = () => {
                         </div>
                         <Target className="w-6 h-6 text-gray-300" />
                     </div>
-                    {analytics.spendingByCategory.length > 0 ? (
+                    {analytics.spendingByCategory && analytics.spendingByCategory.length > 0 ? (
                         <div className="h-72 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={analytics.spendingByCategory}>
@@ -172,7 +176,7 @@ const CustomerDashboardHome = () => {
                         <Clock className="w-6 h-6 text-gray-300" />
                     </div>
                     <div className="space-y-6">
-                        {analytics.recentActivities.length > 0 ? (
+                        {analytics.recentActivities && analytics.recentActivities.length > 0 ? (
                             analytics.recentActivities.map((activity, idx) => (
                                 <div key={idx} className="flex gap-4 group">
                                     <div className={`mt-1 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${activity.type === 'PURCHASE' ? 'bg-blue-50 text-blue-600' : 'bg-yellow-50 text-yellow-600'

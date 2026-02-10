@@ -38,8 +38,8 @@ public class OrderQueryResolver {
         if (userId != null) {
             allOrders = orderService.getOrdersByUser(userId.intValue());
         } else {
-            // Get pending orders as a fallback (service doesn't have getAll)
-            allOrders = orderService.getPendingOrders();
+            // Get all orders for dashboard analytics
+            allOrders = orderService.getAllOrders();
         }
         
         int start = pageNum * pageSize;

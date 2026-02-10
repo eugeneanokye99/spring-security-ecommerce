@@ -1,37 +1,14 @@
-import { useState, useEffect } from 'react';
 import { Package, ShoppingCart, Users, TrendingUp, AlertTriangle, DollarSign, Activity } from 'lucide-react';
-import { getDashboardData } from '../../services/analyticsService';
-import { getLowStockProducts } from '../../services/inventoryService';
+import { useDashboardAnalytics, transformDashboardData } from '../../services/graphqlService';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     LineChart, Line, PieChart, Pie, Cell, Legend
 } from 'recharts';
 
 const Dashboard = () => {
-    const [data, setData] = useState(null);
-    const [lowStockCount, setLowStockCount] = useState(0);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        loadData();
-    }, []);
-
-    const loadData = async () => {
-        try {
-            const [analyticsRes, lowStockRes] = await Promise.all([
-                getDashboardData(),
-                getLowStockProducts()
-            ]);
-            setData(analyticsRes.data);
-            setLowStockCount(lowStockRes.data?.length || 0);
-        } catch (error) {
-            console.error('Error loading dashboard data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading || !data) {
+    const { data: rawData, loading, error, refetch } = useDashboardAnalytics();
+    
+    if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-96">
                 <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -40,7 +17,32 @@ const Dashboard = () => {
         );
     }
 
-    const { overallStats, salesOverTime, categoryDistribution } = data;
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-96">
+                <div className="text-red-600 mb-4">Error loading dashboard data:</div>
+                <p className="text-gray-500 mb-4">{error.message}</p>
+                <button 
+                    onClick={refetch}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                >
+                    Try Again
+                </button>
+            </div>
+        );
+    }
+
+    const data = transformDashboardData(rawData);
+    if (!data) {
+        return (
+            <div className="flex flex-col items-center justify-center h-96">
+                <p className="text-gray-500 font-medium">No data available</p>
+            </div>
+        );
+    }
+
+    const { overallStats, salesOverTime, categoryDistribution, lowStockProducts } = data;
+    const lowStockCount = lowStockProducts.length;
 
     const statCards = [
         {
@@ -116,7 +118,10 @@ const Dashboard = () => {
                                     fontSize={12}
                                     tickLine={false}
                                     axisLine={false}
-                                    tickFormatter={(val) => val.split('-').slice(1).join('/')}
+                                    tickFormatter={(val) => {
+                                        const date = new Date(val);
+                                        return `${date.getMonth() + 1}/${date.getDate()}`;
+                                    }}
                                 />
                                 <YAxis
                                     stroke="#9ca3af"
@@ -128,6 +133,7 @@ const Dashboard = () => {
                                 <Tooltip
                                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                                     formatter={(value) => [`$${value.toFixed(2)}`, 'Revenue']}
+                                    labelFormatter={(val) => `Date: ${val}`}
                                 />
                                 <Line
                                     type="monotone"
@@ -144,7 +150,7 @@ const Dashboard = () => {
 
                 {/* Category Pie Chart */}
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                    <h3 className="text-xl font-bold text-gray-900 mb-8">Sales by Category</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-8">Products by Category</h3>
                     <div className="h-80 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -155,16 +161,17 @@ const Dashboard = () => {
                                     innerRadius={80}
                                     outerRadius={110}
                                     paddingAngle={5}
-                                    dataKey="revenue"
-                                    nameKey="categoryName"
+                                    dataKey="value"
+                                    nameKey="name"
+                                    fill="#8884d8"
                                 >
                                     {categoryDistribution.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell key={`cell-${index}`} fill={entry.fill || COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip
                                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                    formatter={(value) => `$${value.toFixed(2)}`}
+                                    formatter={(value, name) => [`${value} products`, name]}
                                 />
                                 <Legend verticalAlign="bottom" height={36} />
                             </PieChart>
@@ -192,7 +199,7 @@ const Dashboard = () => {
                 </div>
 
                 <div className="space-y-8">
-                    {['api', 'service', 'database'].map(category => {
+                    {data.performanceMetrics && ['api', 'service', 'database'].map(category => {
                         const categoryMetrics = Object.entries(data.performanceMetrics)
                             .filter(([key]) => key.startsWith(`${category}:`))
                             .slice(0, 4);

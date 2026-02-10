@@ -1,25 +1,22 @@
 package com.shopjoy.graphql.resolver.mutation;
 
+import com.shopjoy.dto.mapper.GraphQLMapperStruct;
 import com.shopjoy.dto.response.OrderResponse;
 import com.shopjoy.entity.OrderStatus;
 import com.shopjoy.graphql.input.CreateOrderInput;
-import com.shopjoy.graphql.mapper.GraphQLMapper;
 import com.shopjoy.service.OrderService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
+@AllArgsConstructor
 public class OrderMutationResolver {
 
     private final OrderService orderService;
-    private final GraphQLMapper graphQLMapper;
-
-    public OrderMutationResolver(OrderService orderService, GraphQLMapper graphQLMapper) {
-        this.orderService = orderService;
-        this.graphQLMapper = graphQLMapper;
-    }
+    private final GraphQLMapperStruct graphQLMapper;
 
     @MutationMapping
     public OrderResponse createOrder(@Argument @Valid CreateOrderInput input) {
