@@ -62,7 +62,7 @@ public class AddressServiceImpl implements AddressService {
         
         addressMapper.updateAddressFromRequest(request, address);
         
-        Address updatedAddress = addressRepository.update(address);
+        Address updatedAddress = addressRepository.save(address);
         return addressMapper.toAddressResponse(updatedAddress);
     }
     
@@ -73,7 +73,7 @@ public class AddressServiceImpl implements AddressService {
             throw new ResourceNotFoundException("Address", "id", addressId);
         }
         
-        addressRepository.delete(addressId);
+        addressRepository.deleteById(addressId);
     }
     
     @Override
@@ -83,7 +83,8 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
         
         addressRepository.clearDefaultAddresses(address.getUserId());
-        Address updatedAddress = addressRepository.setDefaultAddress(addressId);
+        address.setDefault(true);
+        Address updatedAddress = addressRepository.save(address);
         return addressMapper.toAddressResponse(updatedAddress);
     }
     

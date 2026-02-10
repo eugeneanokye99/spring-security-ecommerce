@@ -124,7 +124,7 @@ public class PerformanceComparisonService {
             product.setProductId(i);
             product.setProductName("Product_" + i);
             product.setDescription("Description for product " + i);
-            product.setPrice(BigDecimal.valueOf(10 + random.nextDouble() * 990).doubleValue());
+            product.setPrice(BigDecimal.valueOf(10 + random.nextDouble() * 990));
             product.setCategoryId(1 + random.nextInt(10));
             product.setCreatedAt(LocalDateTime.now().minusDays(random.nextInt(365)));
             products.add(product);

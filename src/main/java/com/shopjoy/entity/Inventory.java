@@ -1,5 +1,6 @@
 package com.shopjoy.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,16 +17,50 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "inventory")
 public class Inventory implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "inventory_id")
     private int inventoryId;
+
+    @Column(name = "product_id", unique = true, nullable = false)
     private int productId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    private Product product;
+
+    @Column(name = "quantity_in_stock")
     private int quantityInStock;
+
+    @Column(name = "reorder_level")
     private int reorderLevel;
+
+    @Column(name = "warehouse_location", length = 100)
     private String warehouseLocation;
+
+    @Column(name = "last_restocked")
     private LocalDateTime lastRestocked;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        updatedAt = LocalDateTime.now();
+        if (reorderLevel == 0) {
+            reorderLevel = 10;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -60,14 +60,13 @@ public class CartServiceImpl implements CartService {
             }
 
             cartItem.setQuantity(newQuantity);
-            CartItem updatedItem = cartItemRepository.update(cartItem);
+            CartItem updatedItem = cartItemRepository.save(cartItem);
             return convertToResponse(updatedItem);
         } else {
             CartItem cartItem = CartItem.builder()
                     .userId(request.getUserId())
                     .productId(request.getProductId())
                     .quantity(request.getQuantity())
-                    .createdAt(LocalDateTime.now())
                     .build();
 
             CartItem savedItem = cartItemRepository.save(cartItem);
@@ -90,7 +89,7 @@ public class CartServiceImpl implements CartService {
         }
 
         cartItem.setQuantity(newQuantity);
-        CartItem updatedItem = cartItemRepository.update(cartItem);
+        CartItem updatedItem = cartItemRepository.save(cartItem);
         return convertToResponse(updatedItem);
     }
 
@@ -101,7 +100,7 @@ public class CartServiceImpl implements CartService {
             throw new ResourceNotFoundException("CartItem", "id", cartItemId);
         }
 
-        cartItemRepository.delete(cartItemId);
+        cartItemRepository.deleteById(cartItemId);
     }
 
     @Override

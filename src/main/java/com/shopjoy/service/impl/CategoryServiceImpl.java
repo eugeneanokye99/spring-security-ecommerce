@@ -108,7 +108,7 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
         
-        Category updatedCategory = categoryRepository.update(category);
+        Category updatedCategory = categoryRepository.save(category);
         
         return categoryMapper.toCategoryResponse(updatedCategory);
     }
@@ -130,7 +130,7 @@ public class CategoryServiceImpl implements CategoryService {
                     String.format("Cannot delete category with %d products", productCount));
         }
         
-        categoryRepository.delete(categoryId);
+        categoryRepository.deleteById(categoryId);
     }
     
     @Override
@@ -153,7 +153,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         
         category.setParentCategoryId(newParentId);
-        Category updatedCategory = categoryRepository.update(category);
+        Category updatedCategory = categoryRepository.save(category);
         return categoryMapper.toCategoryResponse(updatedCategory);
     }
     

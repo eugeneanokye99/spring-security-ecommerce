@@ -201,7 +201,7 @@ public class InventoryServiceImpl implements InventoryService {
         inventory.setReorderLevel(reorderLevel);
         inventory.setUpdatedAt(LocalDateTime.now());
 
-        Inventory updatedInventory = inventoryRepository.update(inventory);
+        Inventory updatedInventory = inventoryRepository.save(inventory);
 
         return convertToResponse(updatedInventory);
     }

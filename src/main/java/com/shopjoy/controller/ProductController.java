@@ -400,7 +400,7 @@ public class ProductController {
                 filter.setInStock(inStock);
                 filter.setMinStock(minStock);
                 filter.setMaxStock(maxStock);
-                filter.setIsActive(isActive);
+                filter.setActive(isActive);
 
                 Pageable pageable = Pageable.of(page, size);
                 Page<ProductResponse> response = productService.getProductsWithFilters(filter, pageable, sortBy,

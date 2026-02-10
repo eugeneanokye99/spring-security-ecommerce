@@ -41,11 +41,11 @@ public class UserServiceImpl implements UserService {
     public UserResponse registerUser(CreateUserRequest request) {
         validateCreateUserRequest(request);
 
-        if (userRepository.usernameExists(request.getUsername())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("User", "username", request.getUsername());
         }
 
-        if (userRepository.emailExists(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("User", "email", request.getEmail());
         }
 
@@ -64,11 +64,11 @@ public class UserServiceImpl implements UserService {
     public UserResponse registerUser(CreateUserRequest request, UserType userType) {
         validateCreateUserRequest(request);
 
-        if (userRepository.usernameExists(request.getUsername())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("User", "username", request.getUsername());
         }
 
-        if (userRepository.emailExists(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("User", "email", request.getEmail());
         }
 
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
         validateUpdateUserRequest(request);
 
         if (request.getEmail() != null && !existingUser.getEmail().equals(request.getEmail())) {
-            if (userRepository.emailExists(request.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
                 throw new DuplicateResourceException("User", "email", request.getEmail());
             }
         }
@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
         userMapper.updateUserFromRequest(request, existingUser);
         existingUser.setUpdatedAt(LocalDateTime.now());
 
-        User updatedUser = userRepository.update(existingUser);
+        User updatedUser = userRepository.save(existingUser);
 
         return userMapper.toUserResponse(updatedUser);
     }
@@ -182,17 +182,17 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException("User", "id", userId);
         }
 
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 
     @Override
     public boolean isEmailTaken(String email) {
-        return userRepository.emailExists(email);
+        return userRepository.existsByEmail(email);
     }
 
     @Override
     public boolean isUsernameTaken(String username) {
-        return userRepository.usernameExists(username);
+        return userRepository.existsByUsername(username);
     }
 
     private void validateCreateUserRequest(CreateUserRequest request) {

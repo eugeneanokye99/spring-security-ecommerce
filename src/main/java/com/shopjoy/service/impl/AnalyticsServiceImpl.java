@@ -8,11 +8,13 @@ import com.shopjoy.repository.OrderRepository;
 import com.shopjoy.repository.ProductRepository;
 import com.shopjoy.repository.UserRepository;
 import com.shopjoy.service.AnalyticsService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final ProductRepository productRepository;
@@ -20,18 +22,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final OrderRepository orderRepository;
     private final AnalyticsRepository analyticsRepository;
     private final PerformanceMetricsCollector metricsCollector;
-
-    public AnalyticsServiceImpl(ProductRepository productRepository,
-            UserRepository userRepository,
-            OrderRepository orderRepository,
-            AnalyticsRepository analyticsRepository,
-            PerformanceMetricsCollector metricsCollector) {
-        this.productRepository = productRepository;
-        this.userRepository = userRepository;
-        this.orderRepository = orderRepository;
-        this.analyticsRepository = analyticsRepository;
-        this.metricsCollector = metricsCollector;
-    }
 
     @Override
     public DashboardDataResponse getDashboardData() {

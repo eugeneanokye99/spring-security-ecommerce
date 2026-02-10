@@ -77,8 +77,8 @@ public interface ProductMapperStruct {
      */
     @AfterMapping
     default void setDefaults(@MappingTarget Product product, CreateProductRequest request) {
-        if (product.getCostPrice() == 0.0) {
-            product.setCostPrice(0.0);
+        if (product.getCostPrice() == null || product.getCostPrice().compareTo(java.math.BigDecimal.ZERO) == 0) {
+            product.setCostPrice(java.math.BigDecimal.ZERO);
         }
         if (request.getIsActive() == null) {
             product.setActive(true);

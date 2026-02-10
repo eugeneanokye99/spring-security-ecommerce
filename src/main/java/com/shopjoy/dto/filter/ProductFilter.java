@@ -16,7 +16,8 @@ public class ProductFilter {
     private Integer categoryId;
     private Double minPrice;
     private Double maxPrice;
-    private Boolean isActive;
+    private Boolean active;
+    private String brand;
     private Boolean inStock;
     private Integer minStock;
     private Integer maxStock;

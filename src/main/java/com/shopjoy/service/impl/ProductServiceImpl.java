@@ -9,11 +9,15 @@ import com.shopjoy.dto.response.ProductResponse;
 import com.shopjoy.entity.Product;
 import com.shopjoy.exception.ResourceNotFoundException;
 import com.shopjoy.exception.ValidationException;
+import com.shopjoy.repository.CategoryRepository;
+import com.shopjoy.repository.InventoryRepository;
 import com.shopjoy.repository.ProductRepository;
 import com.shopjoy.service.ProductService;
 import com.shopjoy.util.*;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +36,8 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final com.shopjoy.repository.InventoryRepository inventoryRepository;
-    private final com.shopjoy.repository.CategoryRepository categoryRepository;
+    private final InventoryRepository inventoryRepository;
+    private final CategoryRepository categoryRepository;
     private final ProductMapperStruct productMapper;
 
     private ProductResponse convertToResponse(Product product) {
@@ -136,7 +140,7 @@ public class ProductServiceImpl implements ProductService {
 
         validateProductData(existingProduct);
 
-        Product updatedProduct = productRepository.update(existingProduct);
+        Product updatedProduct = productRepository.save(existingProduct);
 
         return convertToResponse(updatedProduct);
     }
@@ -151,10 +155,10 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
-        product.setPrice(newPrice);
+        product.setPrice(new java.math.BigDecimal(newPrice));
         product.setUpdatedAt(LocalDateTime.now());
 
-        Product updatedProduct = productRepository.update(product);
+        Product updatedProduct = productRepository.save(product);
 
         return convertToResponse(updatedProduct);
     }
@@ -167,7 +171,7 @@ public class ProductServiceImpl implements ProductService {
         product.setActive(true);
         product.setUpdatedAt(LocalDateTime.now());
 
-        return convertToResponse(productRepository.update(product));
+        return convertToResponse(productRepository.save(product));
     }
 
     @Override
@@ -178,7 +182,7 @@ public class ProductServiceImpl implements ProductService {
         product.setActive(false);
         product.setUpdatedAt(LocalDateTime.now());
 
-        return convertToResponse(productRepository.update(product));
+        return convertToResponse(productRepository.save(product));
     }
 
     @Override
@@ -188,7 +192,7 @@ public class ProductServiceImpl implements ProductService {
             throw new ResourceNotFoundException("Product", "id", productId);
         }
 
-        productRepository.delete(productId);
+        productRepository.deleteById(productId);
     }
 
     @Override
@@ -201,12 +205,16 @@ public class ProductServiceImpl implements ProductService {
         if (categoryId == null) {
             throw new ValidationException("Category ID cannot be null");
         }
-        return productRepository.countByCategory(categoryId);
+        return productRepository.countByCategoryId(categoryId);
     }
 
     @Override
     public Page<ProductResponse> getProductsPaginated(Pageable pageable, String sortBy, String sortDirection) {
-        Page<Product> productPage = productRepository.findAllPaginated(pageable, sortBy, sortDirection);
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection != null ? sortDirection : "ASC"), 
+                           sortBy != null ? sortBy : "productId");
+        PageRequest pageRequest = PageRequest.of(pageable.getPage(), pageable.getSize(), sort);
+        
+        org.springframework.data.domain.Page<Product> productPage = productRepository.findAll(pageRequest);
 
         List<ProductResponse> responseList = productPage.getContent().stream()
                 .map(this::convertToResponse)
@@ -214,8 +222,8 @@ public class ProductServiceImpl implements ProductService {
 
         return new Page<>(
                 responseList,
-                productPage.getPageNumber(),
-                productPage.getPageSize(),
+                productPage.getNumber(),
+                productPage.getSize(),
                 productPage.getTotalElements());
     }
 
@@ -225,7 +233,8 @@ public class ProductServiceImpl implements ProductService {
             throw new ValidationException("Search keyword cannot be empty");
         }
 
-        Page<Product> productPage = productRepository.searchProductsPaginated(keyword, pageable);
+        PageRequest pageRequest = PageRequest.of(pageable.getPage(), pageable.getSize());
+        org.springframework.data.domain.Page<Product> productPage = productRepository.searchProducts(keyword, pageRequest);
 
         List<ProductResponse> responseList = productPage.getContent().stream()
                 .map(this::convertToResponse)
@@ -233,8 +242,8 @@ public class ProductServiceImpl implements ProductService {
 
         return new Page<>(
                 responseList,
-                productPage.getPageNumber(),
-                productPage.getPageSize(),
+                productPage.getNumber(),
+                productPage.getSize(),
                 productPage.getTotalElements());
     }
 
@@ -253,7 +262,12 @@ public class ProductServiceImpl implements ProductService {
 
         if (algorithm != null && !algorithm.equalsIgnoreCase("DATABASE")) {
             // Fetch all matching products without pagination
-            List<Product> allProducts = productRepository.findAllWithFilters(filter);
+            List<Product> allProducts = productRepository.findAllWithFilters(
+                    filter.getCategoryId(),
+                    filter.getMinPrice(),
+                    filter.getMaxPrice(),
+                    filter.getBrand(),
+                    filter.getActive());
 
             // Sort in memory using requested algorithm
             Comparator<Product> comparator = ProductComparators.getComparator(sortBy, sortDirection);
@@ -287,7 +301,17 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Default database sorting/pagination
-        Page<Product> productPage = productRepository.findProductsWithFilters(filter, pageable, sortBy, sortDirection);
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection != null ? sortDirection : "ASC"), 
+                           sortBy != null ? sortBy : "productId");
+        PageRequest pageRequest = PageRequest.of(pageable.getPage(), pageable.getSize(), sort);
+        
+        org.springframework.data.domain.Page<Product> productPage = productRepository.findWithFilters(
+                filter.getCategoryId(),
+                filter.getMinPrice(),
+                filter.getMaxPrice(),
+                filter.getBrand(),
+                filter.getActive(),
+                pageRequest);
 
         List<ProductResponse> responseList = productPage.getContent().stream()
                 .map(this::convertToResponse)
@@ -295,8 +319,8 @@ public class ProductServiceImpl implements ProductService {
 
         return new Page<>(
                 responseList,
-                productPage.getPageNumber(),
-                productPage.getPageSize(),
+                productPage.getNumber(),
+                productPage.getSize(),
                 productPage.getTotalElements());
     }
 
@@ -390,7 +414,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getRecentlyAddedProducts(int limit) {
 
-        return productRepository.findRecentlyAdded(limit).stream()
+        return productRepository.findRecentlyAdded(PageRequest.of(0, limit)).stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
@@ -412,11 +436,11 @@ public class ProductServiceImpl implements ProductService {
             throw new ValidationException("categoryId", "must be a valid category ID");
         }
 
-        if (product.getPrice() < 0) {
+        if (product.getPrice().compareTo(java.math.BigDecimal.ZERO) < 0) {
             throw new ValidationException("price", "must not be negative");
         }
 
-        if (product.getCostPrice() < 0) {
+        if (product.getCostPrice().compareTo(java.math.BigDecimal.ZERO) < 0) {
             throw new ValidationException("costPrice", "must not be negative");
         }
 

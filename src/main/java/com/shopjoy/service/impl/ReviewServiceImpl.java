@@ -55,7 +55,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewMapper.toReview(request);
         validateReviewData(review);
 
-        if (reviewRepository.hasUserReviewedProduct(review.getUserId(), review.getProductId())) {
+        if (reviewRepository.existsByUserIdAndProductId(review.getUserId(), review.getProductId())) {
             throw new BusinessException("User has already reviewed this product");
         }
 
@@ -104,7 +104,7 @@ public class ReviewServiceImpl implements ReviewService {
         reviewMapper.updateReviewFromRequest(request, review);
         validateReviewData(review);
 
-        Review updatedReview = reviewRepository.update(review);
+        Review updatedReview = reviewRepository.save(review);
         return convertToResponse(updatedReview);
     }
 
@@ -115,7 +115,7 @@ public class ReviewServiceImpl implements ReviewService {
             throw new ResourceNotFoundException("Review", "id", reviewId);
         }
 
-        reviewRepository.delete(reviewId);
+        reviewRepository.deleteById(reviewId);
     }
 
     @Override

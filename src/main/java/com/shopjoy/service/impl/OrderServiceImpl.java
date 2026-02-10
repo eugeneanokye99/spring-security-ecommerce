@@ -139,8 +139,8 @@ public class OrderServiceImpl implements OrderService {
                     .orderId(createdOrder.getOrderId())
                     .productId(itemReq.getProductId())
                     .quantity(itemReq.getQuantity())
-                    .unitPrice(itemReq.getPrice())
-                    .subtotal(itemReq.getQuantity() * itemReq.getPrice())
+                    .unitPrice(new java.math.BigDecimal(itemReq.getPrice().toString()))
+                    .subtotal(new java.math.BigDecimal(itemReq.getQuantity() * itemReq.getPrice()))
                     .createdAt(LocalDateTime.now())
                     .build();
             orderItemRepository.save(orderItem);
@@ -209,7 +209,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(newStatus);
         order.setUpdatedAt(LocalDateTime.now());
 
-        Order updatedOrder = orderRepository.update(order);
+        Order updatedOrder = orderRepository.save(order);
 
         return convertToResponse(updatedOrder);
     }
@@ -285,7 +285,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.CANCELLED);
         order.setUpdatedAt(LocalDateTime.now());
 
-        Order cancelledOrder = orderRepository.update(order);
+        Order cancelledOrder = orderRepository.save(order);
 
         return convertToResponse(cancelledOrder);
     }
@@ -336,7 +336,7 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
 
         // Delete old items
         for (OrderItem item : existingItems) {
-            orderItemRepository.delete(item.getOrderItemId());
+            orderItemRepository.deleteById(item.getOrderItemId());
         }
 
         // Validate and reserve inventory for new items
@@ -359,19 +359,19 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
                     .orderId(orderId)
                     .productId(itemReq.getProductId())
                     .quantity(itemReq.getQuantity())
-                    .unitPrice(itemReq.getPrice())
-                    .subtotal(itemReq.getQuantity() * itemReq.getPrice())
+                    .unitPrice(new java.math.BigDecimal(itemReq.getPrice().toString()))
+                    .subtotal(new java.math.BigDecimal(itemReq.getQuantity() * itemReq.getPrice()))
                     .createdAt(LocalDateTime.now())
                     .build();
             orderItemRepository.save(orderItem);
         }
 
         // Update total amount
-        order.setTotalAmount(newTotal);
+        order.setTotalAmount(new java.math.BigDecimal(newTotal));
     }
 
     order.setUpdatedAt(LocalDateTime.now());
-    Order updatedOrder = orderRepository.update(order);
+    Order updatedOrder = orderRepository.save(order);
     
     return convertToResponse(updatedOrder);
 }
@@ -392,7 +392,7 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
             inventoryService.releaseStock(item.getProductId(), item.getQuantity());
         }
 
-        orderRepository.delete(orderId);
+        orderRepository.deleteById(orderId);
     }
 
     private void validateStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {

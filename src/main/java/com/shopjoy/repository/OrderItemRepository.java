@@ -1,9 +1,12 @@
 package com.shopjoy.repository;
 
 import com.shopjoy.entity.OrderItem;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface IOrderItemRepository extends GenericRepository<OrderItem, Integer> {
+@Repository
+public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
     List<OrderItem> findByOrderId(int orderId);
 }
