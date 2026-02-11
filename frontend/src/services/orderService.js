@@ -41,6 +41,10 @@ export const shipOrder = (id) => api.patch(`/orders/${id}/ship`);
 // PATCH /api/v1/orders/{id}/complete - Complete order
 export const completeOrder = (id) => api.patch(`/orders/${id}/complete`);
 
+// PATCH /api/v1/orders/{id}/payment - Process order payment
+export const processPayment = (id, transactionId) => 
+    api.patch(`/orders/${id}/payment`, null, { params: { transactionId } });
+
 // PATCH /api/v1/orders/{id}/cancel - Cancel order
 export const cancelOrder = (id) => api.patch(`/orders/${id}/cancel`);
 

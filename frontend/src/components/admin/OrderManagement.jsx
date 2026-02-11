@@ -1,23 +1,42 @@
 import { useState, useEffect } from 'react';
 import { useAllOrders, useUpdateOrderStatus } from '../../services/graphqlService';
-import { Package, Clock, Truck, CheckCircle, XCircle, Search, Eye, Filter, MapPin, CreditCard, User, ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, Clock, Truck, CheckCircle, XCircle, Search, Eye, Filter, MapPin, CreditCard, User, ShoppingBag, ChevronLeft, ChevronRight, DollarSign, ArrowUpDown } from 'lucide-react';
 import { showErrorAlert } from '../../utils/errorHandler';
+import { processPayment } from '../../services/orderService';
+import { toast } from 'react-hot-toast';
 
 const OrderManagement = () => {
     const [statusFilter, setStatusFilter] = useState('ALL');
+    const [paymentStatusFilter, setPaymentStatusFilter] = useState('ALL');
+    const [searchTerm, setSearchTerm] = useState('');
     const [expandedOrder, setExpandedOrder] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
+    const [sortBy, setSortBy] = useState('orderDate');
+    const [sortDirection, setSortDirection] = useState('DESC');
     const pageSize = 20;
 
-    const { data, loading, error, refetch } = useAllOrders(currentPage, pageSize);
+    const filter = {
+        status: statusFilter === 'ALL' ? null : statusFilter,
+        paymentStatus: paymentStatusFilter === 'ALL' ? null : paymentStatusFilter,
+        searchTerm: searchTerm.trim() || null
+    };
+
+    const { data, loading, error, refetch } = useAllOrders(filter, currentPage, pageSize, sortBy, sortDirection);
     const [updateOrderStatusMutation] = useUpdateOrderStatus();
 
     const orders = data?.orders?.orders || [];
     const pageInfo = data?.orders?.pageInfo || {};
 
     useEffect(() => {
-        refetch();
-    }, [currentPage, refetch]);
+        if (error) {
+            const errorMessage = error?.graphQLErrors?.[0]?.message || error.message || 'Failed to sync orders';
+            showErrorAlert({ message: errorMessage }, 'Order Sync Error');
+        }
+    }, [error]);
+
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [statusFilter, paymentStatusFilter, searchTerm, sortBy, sortDirection]);
 
     const handleStatusChange = async (orderId, newStatus) => {
         try {
@@ -27,6 +46,7 @@ const OrderManagement = () => {
                     status: newStatus 
                 }
             });
+            toast.success(`Order ${newStatus.toLowerCase()} successfully`);
             // Refetch data to show updated status and avoid state mismatches
             refetch();
         } catch (error) {
@@ -36,42 +56,42 @@ const OrderManagement = () => {
         }
     };
 
+    const handleProcessPayment = async (orderId) => {
+        const transactionId = `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        try {
+            toast.loading('Processing payment...', { id: 'payment' });
+            await processPayment(orderId, transactionId);
+            toast.success('Payment processed. Order is now PROCESSING', { id: 'payment' });
+            refetch();
+        } catch (error) {
+            console.error('Error processing payment:', error);
+            toast.error(error.response?.data?.message || 'Failed to process payment', { id: 'payment' });
+        }
+    };
+
     const getStatusBadge = (status) => {
         const badges = {
-            PENDING: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-            PROCESSING: { color: 'bg-blue-100 text-blue-800', icon: CheckCircle },
-            SHIPPED: { color: 'bg-indigo-100 text-indigo-800', icon: Truck },
-            DELIVERED: { color: 'bg-emerald-100 text-emerald-800', icon: Package },
-            CANCELLED: { color: 'bg-rose-100 text-rose-800', icon: XCircle },
+            PENDING: { color: 'bg-yellow-100 text-yellow-800' },
+            PROCESSING: { color: 'bg-blue-100 text-blue-800' },
+            SHIPPED: { color: 'bg-indigo-100 text-indigo-800' },
+            DELIVERED: { color: 'bg-emerald-100 text-emerald-800' },
+            CANCELLED: { color: 'bg-rose-100 text-rose-800' },
+        };
+        const Icons = {
+            PENDING: Clock,
+            PROCESSING: CheckCircle,
+            SHIPPED: Truck,
+            DELIVERED: Package,
+            CANCELLED: XCircle,
         };
         const badge = badges[status] || badges.PENDING;
-        const Icon = badge.icon;
+        const Icon = Icons[status] || Icons.PENDING;
         return (
             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${badge.color}`}>
                 <Icon className="w-3 h-3" /> {status}
             </span>
         );
     };
-
-    const filteredOrders = statusFilter === 'ALL'
-        ? orders
-        : orders.filter(o => o.status === statusFilter);
-
-    if (error) {
-        return (
-            <div className="flex flex-col items-center justify-center h-96">
-                <div className="text-red-600 mb-4">Error loading orders:</div>
-                <p className="text-gray-500 mb-4">{error.message}</p>
-                <button 
-                    onClick={refetch}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                >
-                    Retry
-                </button>
-            </div>
-        );
-    }
-
     return (
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -80,23 +100,62 @@ const OrderManagement = () => {
                     <p className="text-gray-500 mt-2">Manage customer orders and workflow transitions.</p>
                 </div>
 
-                <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-                    <div className="flex items-center gap-2 px-3 text-gray-400">
+                <div className="flex flex-wrap items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search orders..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-primary-500 transition-all w-48"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-2 px-3 text-gray-400 border-l border-gray-100">
                         <Filter className="w-4 h-4" />
-                        <span className="text-xs font-bold uppercase">Filter By</span>
+                        <span className="text-xs font-black uppercase">Status</span>
                     </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="bg-gray-50 border-none rounded-xl text-xs font-bold py-2 px-4 focus:ring-2 focus:ring-primary-500 transition-all"
                     >
-                        <option value="ALL">All Orders</option>
+                        <option value="ALL">All Status</option>
                         <option value="PENDING">Pending</option>
                         <option value="PROCESSING">Processing</option>
                         <option value="SHIPPED">Shipped</option>
                         <option value="DELIVERED">Delivered</option>
                         <option value="CANCELLED">Cancelled</option>
                     </select>
+
+                    <select
+                        value={paymentStatusFilter}
+                        onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                        className="bg-gray-50 border-none rounded-xl text-xs font-bold py-2 px-4 focus:ring-2 focus:ring-primary-500 transition-all"
+                    >
+                        <option value="ALL">All Payment</option>
+                        <option value="PAID">Paid</option>
+                        <option value="UNPAID">Unpaid</option>
+                        <option value="PENDING">Pending</option>
+                    </select>
+
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="bg-gray-50 border-none rounded-xl text-xs font-bold py-2 px-4 focus:ring-2 focus:ring-primary-500 transition-all"
+                    >
+                        <option value="orderDate">Date</option>
+                        <option value="totalAmount">Amount</option>
+                        <option value="orderId">ID</option>
+                    </select>
+
+                    <button
+                        onClick={() => setSortDirection(sortDirection === 'ASC' ? 'DESC' : 'ASC')}
+                        className="p-2 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all"
+                    >
+                        <ArrowUpDown className={`w-4 h-4 text-gray-600 ${sortDirection === 'ASC' ? 'rotate-180' : ''}`} />
+                    </button>
                 </div>
             </div>
 
@@ -120,7 +179,7 @@ const OrderManagement = () => {
                                     <p className="mt-4 text-sm font-medium text-gray-500 uppercase tracking-widest">Syncing Orders...</p>
                                 </td>
                             </tr>
-                        ) : filteredOrders.length === 0 ? (
+                        ) : orders.length === 0 ? (
                             <tr>
                                 <td colSpan="6" className="px-6 py-24 text-center">
                                     <div className="w-16 h-16 bg-gray-50 text-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -130,7 +189,7 @@ const OrderManagement = () => {
                                 </td>
                             </tr>
                         ) : (
-                            filteredOrders.map((order) => (
+                            orders.map((order) => (
                                 <>
                                     <tr key={order.orderId} className="hover:bg-gray-50/50 transition-colors group border-b border-gray-100">
                                         <td className="px-6 py-5">
@@ -205,12 +264,20 @@ const OrderManagement = () => {
                                         <td className="px-6 py-5 text-right">
                                             <div className="flex justify-end gap-2">
                                                 {order.status === 'PENDING' && (
-                                                    <button
-                                                        onClick={() => handleStatusChange(order.orderId, 'PROCESSING')}
-                                                        className="px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
-                                                    >
-                                                        Accept
-                                                    </button>
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleProcessPayment(order.orderId)}
+                                                            className="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 flex items-center gap-2"
+                                                        >
+                                                            <DollarSign className="w-3 h-3" /> Process Payment
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleStatusChange(order.orderId, 'PROCESSING')}
+                                                            className="px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+                                                        >
+                                                            Accept Only
+                                                        </button>
+                                                    </>
                                                 )}
                                                 {order.status === 'PROCESSING' && (
                                                     <button

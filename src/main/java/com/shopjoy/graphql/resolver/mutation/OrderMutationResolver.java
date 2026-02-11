@@ -42,4 +42,9 @@ public class OrderMutationResolver {
         OrderStatus orderStatus = OrderStatus.valueOf(status);
         return orderService.updateOrderStatus(id.intValue(), orderStatus);
     }
+
+    @MutationMapping
+    public OrderResponse simulatePayment(@Argument Long id, @Argument String transactionId) {
+        return orderService.simulatePayment(id.intValue(), transactionId);
+    }
 }

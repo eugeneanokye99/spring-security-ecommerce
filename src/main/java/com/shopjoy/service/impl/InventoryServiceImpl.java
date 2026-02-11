@@ -13,6 +13,7 @@ import com.shopjoy.service.InventoryService;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -34,7 +35,7 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryMapperStruct inventoryMapper;
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public InventoryResponse createInventory(Integer productId, int initialStock, int reorderLevel) {
         Inventory inventory = new Inventory();
         inventory.setProductId(productId);
@@ -84,7 +85,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public InventoryResponse updateStock(Integer productId, int newQuantity) {
         if (newQuantity < 0) {
             throw new ValidationException("quantityInStock", "cannot be negative");
@@ -102,7 +103,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public InventoryResponse addStock(Integer productId, int quantity) {
         if (quantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
@@ -121,7 +122,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public InventoryResponse removeStock(Integer productId, int quantity) {
         if (quantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
@@ -145,8 +146,15 @@ public class InventoryServiceImpl implements InventoryService {
         return convertToResponse(inventory);
     }
 
+    /**
+     * RESERVATION TRANSACTION LOGIC
+     * <p>
+     * This method is designed to be called within an existing order transaction.
+     * It uses REQUIRED propagation to join the caller's transaction context.
+     * If the order creation fails later, this stock decrement will be rolled back.
+     */
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void reserveStock(Integer productId, int quantity) {
         if (quantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
@@ -166,7 +174,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void releaseStock(Integer productId, int quantity) {
         if (quantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
@@ -189,7 +197,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public InventoryResponse updateReorderLevel(Integer productId, int reorderLevel) {
         if (reorderLevel < 0) {
             throw new ValidationException("reorderLevel", "cannot be negative");

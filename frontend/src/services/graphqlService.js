@@ -39,9 +39,9 @@ export const useUserAnalytics = (userId) => {
   });
 };
 
-export const useAllOrders = (page = 0, size = 20) => {
+export const useAllOrders = (filter = null, page = 0, size = 20, sortBy = 'orderDate', sortDirection = 'DESC') => {
   return useQuery(GET_ALL_ORDERS, {
-    variables: { page, size },
+    variables: { filter, page, size, sortBy, sortDirection },
     fetchPolicy: 'cache-and-network',
     errorPolicy: 'all'
   });
@@ -56,9 +56,9 @@ export const useOrderById = (orderId) => {
   });
 };
 
-export const useUserOrders = (userId, page = 0, size = 20) => {
+export const useUserOrders = (userId, filter = null, page = 0, size = 20, sortBy = 'orderDate', sortDirection = 'DESC') => {
   return useQuery(GET_USER_ORDERS, {
-    variables: { userId, page, size },
+    variables: { userId, filter, page, size, sortBy, sortDirection },
     skip: !userId,
     fetchPolicy: 'cache-and-network',
     errorPolicy: 'all'

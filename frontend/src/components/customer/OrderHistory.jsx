@@ -1,17 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUserOrders, useUpdateOrderStatus, useUpdateOrder, useDeleteOrder } from '../../services/graphqlService';
 import { useAuth } from '../../context/AuthContext';
-import { Package, Clock, Truck, CheckCircle, XCircle, Trash2, X, Edit, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, Clock, Truck, CheckCircle, XCircle, Trash2, X, Edit, Plus, Minus, ChevronLeft, ChevronRight, Search, Filter, ArrowUpDown } from 'lucide-react';
 import { showErrorAlert, showSuccessToast, showWarningToast } from '../../utils/errorHandler';
 
 const OrderHistory = () => {
     const [editingOrder, setEditingOrder] = useState(null);
     const [editForm, setEditForm] = useState({});
     const [currentPage, setCurrentPage] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('ALL');
+    const [paymentStatusFilter, setPaymentStatusFilter] = useState('ALL');
+    const [sortBy, setSortBy] = useState('orderDate');
+    const [sortDirection, setSortDirection] = useState('DESC');
+    
     const { user } = useAuth();
-    const pageSize = 20;
+    const pageSize = 10;
 
-    const { data, loading, error, refetch } = useUserOrders(user?.userId, currentPage, pageSize);
+    const filter = {
+        searchTerm: searchTerm.trim() || null,
+        status: statusFilter === 'ALL' ? null : statusFilter,
+        paymentStatus: paymentStatusFilter === 'ALL' ? null : paymentStatusFilter
+    };
+
+    const { data, loading, error, refetch } = useUserOrders(
+        user?.userId, 
+        filter,
+        currentPage, 
+        pageSize,
+        sortBy,
+        sortDirection
+    );
+    
+    useEffect(() => {
+        if (error) {
+            const errorMessage = error?.graphQLErrors?.[0]?.message || error.message || 'Failed to load orders';
+            showErrorAlert({ message: errorMessage }, 'Order Sync Failed');
+        }
+    }, [error]);
+
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [searchTerm, statusFilter, paymentStatusFilter, sortBy, sortDirection]);
     const [updateOrderStatusMutation] = useUpdateOrderStatus();
     const [updateOrderMutation] = useUpdateOrder();
     const [deleteOrderMutation] = useDeleteOrder();
@@ -160,7 +190,7 @@ const handleUpdateOrder = async (orderId) => {
         );
     };
 
-    if (loading) {
+    if (loading && !data) {
         return (
             <div className="flex justify-center py-12">
                 <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
@@ -168,24 +198,69 @@ const handleUpdateOrder = async (orderId) => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="flex flex-col items-center justify-center py-12">
-                <div className="text-red-600 mb-4">Error loading order history:</div>
-                <p className="text-gray-500 mb-4">{error.message}</p>
-                <button 
-                    onClick={refetch}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                >
-                    Try Again
-                </button>
-            </div>
-        );
-    }
-
     return (
-        <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Order History</h1>
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h1 className="text-3xl font-bold text-gray-900">Order History</h1>
+                
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search orders..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 text-sm w-full md:w-64"
+                        />
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm">
+                        <Filter className="w-4 h-4 text-gray-400" />
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 py-2 pl-2 pr-8 text-sm"
+                        >
+                            <option value="ALL">All Status</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="PROCESSING">Processing</option>
+                            <option value="SHIPPED">Shipped</option>
+                            <option value="DELIVERED">Delivered</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+
+                        <select
+                            value={paymentStatusFilter}
+                            onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                            className="border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 py-2 pl-2 pr-8 text-sm"
+                        >
+                            <option value="ALL">All Payment</option>
+                            <option value="PAID">Paid</option>
+                            <option value="UNPAID">Unpaid</option>
+                            <option value="PENDING">Pending</option>
+                        </select>
+                        
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 py-2 pl-2 pr-8 text-sm"
+                        >
+                            <option value="orderDate">Order Date</option>
+                            <option value="totalAmount">Total Amount</option>
+                            <option value="orderId">Order ID</option>
+                        </select>
+                        
+                        <button
+                            onClick={() => setSortDirection(sortDirection === 'ASC' ? 'DESC' : 'ASC')}
+                            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 bg-white"
+                            title={sortDirection === 'ASC' ? 'Sort Ascending' : 'Sort Descending'}
+                        >
+                            <ArrowUpDown className={`w-4 h-4 text-gray-600 transition-transform ${sortDirection === 'ASC' ? 'rotate-180' : ''}`} />
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             {orders.length === 0 ? (
                 <div className="card p-12 text-center">

@@ -217,6 +217,16 @@ input UserFilterInput {
     searchTerm: String
 }
 
+input OrderFilterInput {
+    status: String
+    paymentStatus: String
+    startDate: DateTime
+    endDate: DateTime
+    minAmount: Float
+    maxAmount: Float
+    searchTerm: String
+}
+
 type UserConnection {
     users: [User]
     pageInfo: PageInfo
@@ -255,7 +265,7 @@ type Query {
     categories: [Category]
     
     order(id: ID!): Order
-    orders(userId: ID, page: Int, size: Int): OrderConnection
+    orders(userId: ID, filter: OrderFilterInput, page: Int, size: Int, sortBy: String, sortDirection: String): OrderConnection
     
     review(id: ID!): Review
     reviews(productId: ID, userId: ID, page: Int, size: Int): ReviewConnection
@@ -286,6 +296,7 @@ type Mutation {
     updateOrder(id: ID!, input: UpdateOrderInput!): Order
     deleteOrder(id: ID!): Boolean
     updateOrderStatus(id: ID!, status: String!): Order
+    simulatePayment(id: ID!, transactionId: String!): Order
     
     createReview(input: CreateReviewInput!): Review
     updateReview(id: ID!, input: UpdateReviewInput!): Review

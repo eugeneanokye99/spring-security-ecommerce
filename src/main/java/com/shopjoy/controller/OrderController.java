@@ -312,6 +312,27 @@ public class OrderController {
         }
 
         /**
+         * Process payment for an order.
+         *
+         * @param id the id
+         * @param transactionId the transaction id
+         * @return the response entity
+         */
+        @Operation(summary = "Process order payment", description = "Updates order payment status and transitions to PROCESSING")
+        @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+                        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Payment processed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderResponse.class))),
+                        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json")),
+                        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Payment processing failed", content = @Content(mediaType = "application/json"))
+        })
+        @PatchMapping("/{id}/payment")
+        public ResponseEntity<ApiResponse<OrderResponse>> processPayment(
+                        @Parameter(description = "Order unique identifier", required = true, example = "1") @PathVariable Integer id,
+                        @RequestParam String transactionId) {
+                OrderResponse response = orderService.processPayment(id, transactionId);
+                return ResponseEntity.ok(ApiResponse.success(response, "Payment processed successfully"));
+        }
+
+        /**
          * Cancel order response entity.
          *
          * @param id the id

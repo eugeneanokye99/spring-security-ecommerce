@@ -1,5 +1,6 @@
 package com.shopjoy.service.impl;
 
+import com.shopjoy.dto.filter.OrderFilter;
 import com.shopjoy.dto.mapper.OrderMapperStruct;
 import com.shopjoy.dto.mapper.OrderItemMapperStruct;
 import com.shopjoy.dto.request.CreateOrderItemRequest;
@@ -19,6 +20,7 @@ import com.shopjoy.exception.ResourceNotFoundException;
 import com.shopjoy.exception.ValidationException;
 import com.shopjoy.repository.OrderItemRepository;
 import com.shopjoy.repository.OrderRepository;
+import com.shopjoy.specification.OrderSpecification;
 import com.shopjoy.service.InventoryService;
 import com.shopjoy.service.OrderService;
 import com.shopjoy.service.ProductService;
@@ -26,8 +28,10 @@ import com.shopjoy.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -40,8 +44,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
-
-
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
@@ -59,6 +61,8 @@ public class OrderServiceImpl implements OrderService {
      * @param inventoryService    the inventory service
      * @param productService      the product service
      * @param userService         the user service
+     * @param orderMapper         the order mapper
+     * @param orderItemMapper     the order item mapper
      */
     public OrderServiceImpl(OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
@@ -87,11 +91,12 @@ public class OrderServiceImpl implements OrderService {
      * 5. Creates order
      * 6. Creates order items
      * <p>
-     * If ANY step fails, entire transaction is rolled back.
-     * Uses SERIALIZABLE isolation to prevent phantom reads during stock checks.
+     * If ANY step fails (e.g. InsufficientStockException), the entire transaction 
+     * including inventory reservations and order record creation will be rolled back.
+     * Uses SERIALIZABLE isolation to prevent phantom reads during the stock check-and-reserve phase.
      */
     @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public OrderResponse createOrder(CreateOrderRequest request) {
         userService.getUserById(request.getUserId());
 
@@ -168,6 +173,18 @@ public class OrderServiceImpl implements OrderService {
 
         // Return refreshed order with items
         return getOrderById(createdOrder.getOrderId());
+    }
+
+    @Override
+    public Page<OrderResponse> getOrders(Integer userId, OrderFilter filter, Pageable pageable) {
+        Specification<Order> spec = OrderSpecification.withFilters(userId, filter);
+        Page<Order> orderPage = orderRepository.findAll(spec, pageable);
+
+        List<OrderResponse> content = orderPage.getContent().stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(content, pageable, orderPage.getTotalElements());
     }
 
     @Override
@@ -271,7 +288,7 @@ public class OrderServiceImpl implements OrderService {
      * -> CANCELLED (from PENDING or PROCESSING only)
      */
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public OrderResponse updateOrderStatus(Integer orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -288,7 +305,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public OrderResponse confirmOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -301,7 +318,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public OrderResponse shipOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -314,7 +331,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public OrderResponse completeOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -327,17 +344,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * COMPLEX ROLLBACK SCENARIO
+     * COMPLEX ROLLBACK SCENARIO - Order Cancellation
      * <p>
      * When cancelling an order, we must:
      * 1. Validate order can be canceled
-     * 2. Release reserved inventory back to stock
+     * 2. Release reserved inventory back to stock (Atomic operation)
      * 3. Update order status
      * <p>
-     * If inventory release fails, entire transaction rolls back.
+     * If inventory release fails for any item, the status update will be rolled back,
+     * ensuring the order doesn't appear cancelled while stock is still missing.
      */
     @Override
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public OrderResponse cancelOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -532,5 +550,66 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
         }).collect(Collectors.toList());
 
         return orderMapper.toOrderResponse(order, userName, itemResponses);
+    }
+
+    /**
+     * PAYMENT WORKFLOW DEMONSTRATION
+     * <p>
+     * This method simulates a payment confirmation workflow.
+     * 1. Updates payment status Atomically.
+     * 2. Transitions order status to PROCESSING.
+     * 3. Uses REQUIRED propagation to ensure both updates happen in one transaction.
+     * <p>
+     * If transitioning the order status fails (e.g., business rule violation), 
+     * the payment status update will also be rolled back.
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public OrderResponse processPayment(Integer orderId, String transactionId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            throw new ValidationException("Order is already paid");
+        }
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new InvalidOrderStateException(orderId, "CANCELLED", "process payment");
+        }
+
+        // Simulate payment gateway interaction or logging the transaction ID
+        order.setPaymentStatus(PaymentStatus.PAID);
+        order.setUpdatedAt(LocalDateTime.now());
+        
+        // Save initial state before transition
+        orderRepository.save(order);
+
+        // Chain status update - this happens within the same transaction context
+        return confirmOrder(orderId);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public OrderResponse simulatePayment(Integer orderId, String transactionId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            throw new ValidationException("Simulation: Order " + orderId + " is already paid.");
+        }
+
+        // 1. Update Payment Status (First step of the transaction)
+        order.setPaymentStatus(PaymentStatus.PAID);
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
+
+        // 2. Demonstration of Rollback
+        // Trigger failure if transactionId starts with "FAIL-"
+        if (transactionId != null && transactionId.startsWith("FAIL-")) {
+            throw new RuntimeException("Simulated payment gateway failure for order " + orderId);
+        }
+
+        // 3. Update Order Status (Final step) - transition to PROCESSING
+        return confirmOrder(orderId);
     }
 }

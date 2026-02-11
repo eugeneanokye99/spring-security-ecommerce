@@ -1,5 +1,6 @@
 package com.shopjoy.service;
 
+import com.shopjoy.dto.filter.OrderFilter;
 import com.shopjoy.dto.request.CreateOrderRequest;
 import com.shopjoy.dto.request.UpdateOrderRequest;
 import com.shopjoy.dto.response.OrderResponse;
@@ -34,11 +35,29 @@ public interface OrderService {
     OrderResponse createOrder(CreateOrderRequest request);
 
     /**
-     * Retrieves an order by its ID.
+     * Processes payment for an existing order.
+     * Updates payment status and potentially triggers order status transition.
      * 
      * @param orderId the order ID
-     * @return the order response
+     * @param transactionId external payment gateway transaction ID
+     * @return the updated order response
      * @throws ResourceNotFoundException if order not found
+     * @throws InvalidOrderStateException if order is already paid or cancelled
+     */
+    OrderResponse processPayment(Integer orderId, String transactionId);
+
+    /**
+     * Simulates payment for demonstration purposes.
+     * Includes logic to trigger a transactional rollback under certain conditions.
+     * 
+     * @param orderId the order ID
+     * @param transactionId the transaction ID
+     * @return the updated order response
+     */
+    OrderResponse simulatePayment(Integer orderId, String transactionId);
+
+    /**
+     * Retrieves an order by its ID.
      */
     OrderResponse getOrderById(Integer orderId);
 
@@ -94,6 +113,16 @@ public interface OrderService {
      * @return paginated order responses
      */
     Page<OrderResponse> getOrdersByDateRangePaginated(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+    /**
+     * Retrieves orders based on a variety of filters.
+     * 
+     * @param userId   optional user ID to filter by
+     * @param filter   the filter criteria
+     * @param pageable pagination and sorting parameters
+     * @return paginated order responses
+     */
+    Page<OrderResponse> getOrders(Integer userId, OrderFilter filter, Pageable pageable);
 
     /**
      * Retrieves all orders with pagination.

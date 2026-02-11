@@ -19,6 +19,11 @@ public class TransactionAspect {
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final long LONG_TRANSACTION_THRESHOLD = 5000;
     
+    @Before("@within(org.springframework.transaction.annotation.Transactional)")
+    public void logTransactionalClassStart(JoinPoint joinPoint) {
+        logTransactionStart(joinPoint);
+    }
+    
     @Before("@annotation(org.springframework.transaction.annotation.Transactional)")
     public void logTransactionStart(JoinPoint joinPoint) {
         String timestamp = LocalDateTime.now().format(timeFormatter);
@@ -27,12 +32,22 @@ public class TransactionAspect {
         logger.info("[{}] TRANSACTION START: {}", timestamp, methodSignature);
     }
     
+    @AfterReturning("@within(org.springframework.transaction.annotation.Transactional)")
+    public void logTransactionalClassCommit(JoinPoint joinPoint) {
+        logTransactionCommit(joinPoint);
+    }
+    
     @AfterReturning("@annotation(org.springframework.transaction.annotation.Transactional)")
     public void logTransactionCommit(JoinPoint joinPoint) {
         String timestamp = LocalDateTime.now().format(timeFormatter);
         String methodSignature = AspectUtils.extractMethodSignature(joinPoint);
         
         logger.info("[{}] TRANSACTION COMMIT: {}", timestamp, methodSignature);
+    }
+    
+    @AfterThrowing(pointcut = "@within(org.springframework.transaction.annotation.Transactional)", throwing = "exception")
+    public void logTransactionalClassRollback(JoinPoint joinPoint, Exception exception) {
+        logTransactionRollback(joinPoint, exception);
     }
     
     @AfterThrowing(pointcut = "@annotation(org.springframework.transaction.annotation.Transactional)", throwing = "exception")
@@ -44,7 +59,7 @@ public class TransactionAspect {
             timestamp, methodSignature, exception.getMessage());
     }
     
-    @Around("@annotation(org.springframework.transaction.annotation.Transactional)")
+    @Around("@within(org.springframework.transaction.annotation.Transactional) || @annotation(org.springframework.transaction.annotation.Transactional)")
     public Object monitorTransactionDuration(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodSignature = AspectUtils.extractMethodSignature(joinPoint);
         long startTime = System.currentTimeMillis();
