@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Star, ThumbsUp, Send, MessageSquare } from 'lucide-react';
 import { getReviewsByProduct, createReview, markReviewAsHelpful } from '../../services/reviewService';
 import { useAuth } from '../../context/AuthContext';
+import { showErrorAlert } from '../../utils/errorHandler';
 
 const ProductDetailModal = ({ product, onClose }) => {
     const { user } = useAuth();
@@ -35,7 +36,7 @@ const ProductDetailModal = ({ product, onClose }) => {
     const handleSubmitReview = async (e) => {
         e.preventDefault();
         if (!user) {
-            alert('Please login to leave a review');
+            showErrorAlert({ message: 'Please login to leave a review' }, 'Authentication Required');
             return;
         }
 
@@ -49,7 +50,7 @@ const ProductDetailModal = ({ product, onClose }) => {
             setNewReview({ rating: 5, title: '', comment: '' });
             loadReviews();
         } catch (error) {
-            alert(error.response?.data?.message || 'Error submitting review');
+            showErrorAlert(error, 'Error submitting review');
         } finally {
             setSubmitting(false);
         }

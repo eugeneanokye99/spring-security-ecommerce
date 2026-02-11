@@ -21,7 +21,7 @@ import {
     deactivateProduct,
 } from '../../services/productService';
 import { getAllCategories } from '../../services/categoryService';
-import { showErrorAlert, formatErrorMessage, extractFieldErrors, isValidationError } from '../../utils/errorHandler';
+import { showErrorAlert, formatErrorMessage, extractFieldErrors, isValidationError, showSuccessToast } from '../../utils/errorHandler';
 
 const ProductManagement = () => {
     const [products, setProducts] = useState([]);
@@ -115,10 +115,10 @@ const ProductManagement = () => {
 
             if (editingProduct) {
                 await updateProduct(editingProduct.productId, productData);
-                alert('Product updated successfully!');
+                showSuccessToast('Product updated successfully!');
             } else {
                 await createProduct(productData);
-                alert('Product created successfully!');
+                showSuccessToast('Product created successfully!');
             }
 
             setShowModal(false);
@@ -161,7 +161,7 @@ const ProductManagement = () => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             try {
                 await deleteProduct(id);
-                alert('Product deleted successfully!');
+                showSuccessToast('Product deleted successfully!');
                 loadProducts();
             } catch (error) {
                 console.error('Error deleting product:', error);
@@ -174,10 +174,10 @@ const ProductManagement = () => {
         try {
             if (product.active) {
                 await deactivateProduct(product.productId);
-                alert('Product deactivated successfully!');
+                showSuccessToast('Product deactivated successfully!');
             } else {
                 await activateProduct(product.productId);
-                alert('Product activated successfully!');
+                showSuccessToast('Product activated successfully!');
             }
             loadProducts();
         } catch (error) {

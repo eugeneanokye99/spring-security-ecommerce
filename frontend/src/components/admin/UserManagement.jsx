@@ -28,7 +28,7 @@ const UserManagement = () => {
                 await deleteUser(id);
                 loadUsers();
             } catch (error) {
-                alert(error.message);
+                showErrorAlert(error, 'Failed to delete user');
             }
         }
     };

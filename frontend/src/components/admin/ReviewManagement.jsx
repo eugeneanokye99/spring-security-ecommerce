@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Trash2, MessageSquare, Star, User, Package, Calendar } from 'lucide-react';
 import { getAllReviews, deleteReview } from '../../services/reviewService';
+import { showErrorAlert } from '../../utils/errorHandler';
 
 const ReviewManagement = () => {
     const [reviews, setReviews] = useState([]);
@@ -29,7 +30,7 @@ const ReviewManagement = () => {
                 await deleteReview(id);
                 loadReviews();
             } catch (error) {
-                alert(error.message);
+                showErrorAlert(error, 'Failed to delete review');
             }
         }
     };

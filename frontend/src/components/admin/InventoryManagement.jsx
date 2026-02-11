@@ -50,11 +50,17 @@ const InventoryManagement = () => {
 
         // Filter by stock status
         if (stockFilter !== 'all') {
-            filtered = filtered.filter(item => getStockStatus(item) === stockFilter);
+            if (stockFilter === 'in') {
+                filtered = filtered.filter(item => item.stockQuantity > 0);
+            } else {
+                filtered = filtered.filter(item => getStockStatus(item) === stockFilter);
+            }
         }
 
         // Filter by active tab
-        if (activeTab !== 'all') {
+        if (activeTab === 'in') {
+            filtered = filtered.filter(item => item.stockQuantity > 0);
+        } else if (activeTab !== 'all') {
             filtered = filtered.filter(item => getStockStatus(item) === activeTab);
         }
 
@@ -81,7 +87,7 @@ const InventoryManagement = () => {
 
     const getTabCounts = () => {
         const all = allItems.length;
-        const inStock = allItems.filter(item => getStockStatus(item) === 'in').length;
+        const inStock = allItems.filter(item => item.stockQuantity > 0).length;
         const lowStock = allItems.filter(item => getStockStatus(item) === 'low').length;
         const outOfStock = allItems.filter(item => getStockStatus(item) === 'out').length;
         return { all, inStock, lowStock, outOfStock };
@@ -198,7 +204,7 @@ const InventoryManagement = () => {
                                                 status === 'low' ? 'bg-yellow-100 text-yellow-800' :
                                                 'bg-green-100 text-green-800'
                                             }`}>
-                                                {status === 'out' ? 'Out of Stock' : status === 'low' ? 'Low Stock' : 'In Stock'}
+                                                {status === 'out' ? 'Out of Stock' : status === 'low' ? 'In Stock (Low)' : 'In Stock'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
