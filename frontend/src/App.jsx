@@ -22,7 +22,11 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user.userType !== requiredRole) {
+  // Case-insensitive role check
+  const userRole = (user.userType || '').toUpperCase();
+  const targetRole = (requiredRole || '').toUpperCase();
+
+  if (requiredRole && userRole !== targetRole) {
     return <Navigate to="/login" replace />;
   }
 

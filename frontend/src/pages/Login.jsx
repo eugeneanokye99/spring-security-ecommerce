@@ -20,8 +20,9 @@ const Login = () => {
         try {
             const userData = await login(username, password);
 
-            // Role-based routing
-            if (userData.userType === 'ADMIN') {
+            // Role-based routing - Use case-insensitive comparison
+            const role = (userData.userType || '').toUpperCase();
+            if (role === 'ADMIN') {
                 navigate('/admin/dashboard');
             } else {
                 navigate('/customer/dashboard');

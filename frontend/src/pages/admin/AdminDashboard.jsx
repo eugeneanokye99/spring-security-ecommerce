@@ -31,7 +31,8 @@ const AdminDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     useEffect(() => {
-        if (user?.userType !== 'ADMIN') {
+        const role = (user?.userType || '').toUpperCase();
+        if (role !== 'ADMIN') {
             navigate('/login');
         }
     }, [user, navigate]);

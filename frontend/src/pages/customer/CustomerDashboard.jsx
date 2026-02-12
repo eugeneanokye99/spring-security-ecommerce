@@ -15,7 +15,8 @@ const CustomerDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     useEffect(() => {
-        if (user?.userType !== 'CUSTOMER') {
+        const role = (user?.userType || '').toUpperCase();
+        if (role !== 'CUSTOMER') {
             navigate('/login');
         }
     }, [user, navigate]);

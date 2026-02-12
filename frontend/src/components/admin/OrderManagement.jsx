@@ -160,8 +160,8 @@ const OrderManagement = () => {
                 </div>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <table className="w-full text-left border-collapse">
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[1000px]">
                     <thead className="bg-gray-50/50 border-b border-gray-100">
                         <tr>
                             <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Order Details</th>
@@ -268,38 +268,38 @@ const OrderManagement = () => {
                                                     <>
                                                         <button
                                                             onClick={() => handleProcessPayment(order.orderId)}
-                                                            className="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 flex items-center gap-2"
+                                                            className="px-3 py-1.5 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 flex items-center gap-1.5 whitespace-nowrap"
                                                         >
-                                                            <DollarSign className="w-3 h-3" /> Process Payment
+                                                            <DollarSign className="w-3.5 h-3.5" /> Pay
                                                         </button>
                                                         <button
                                                             onClick={() => handleStatusChange(order.orderId, 'PROCESSING')}
-                                                            className="px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+                                                            className="px-3 py-1.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 whitespace-nowrap"
                                                         >
-                                                            Accept Only
+                                                            Accept
                                                         </button>
                                                     </>
                                                 )}
                                                 {order.status && order.status.toUpperCase() === 'PROCESSING' && (
                                                     <button
                                                         onClick={() => handleStatusChange(order.orderId, 'SHIPPED')}
-                                                        className="px-4 py-2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                                                        className="px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 whitespace-nowrap"
                                                     >
-                                                        Ship Order
+                                                        Ship
                                                     </button>
                                                 )}
                                                 {order.status && order.status.toUpperCase() === 'SHIPPED' && (
                                                     <button
                                                         onClick={() => handleStatusChange(order.orderId, 'DELIVERED')}
-                                                        className="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100"
+                                                        className="px-3 py-1.5 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 whitespace-nowrap"
                                                     >
-                                                        Mark Delivered
+                                                        Deliver
                                                     </button>
                                                 )}
                                                 {order.status && ['PENDING', 'PROCESSING'].includes(order.status.toUpperCase()) && (
                                                     <button
                                                         onClick={() => handleStatusChange(order.orderId, 'CANCELLED')}
-                                                        className="px-4 py-2 bg-white text-rose-600 border border-rose-100 text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-rose-50 transition-all"
+                                                        className="px-3 py-1.5 bg-white text-rose-600 border border-rose-100 text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-rose-50 transition-all whitespace-nowrap"
                                                     >
                                                         Cancel
                                                     </button>
