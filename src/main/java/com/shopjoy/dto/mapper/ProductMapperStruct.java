@@ -5,7 +5,6 @@ import com.shopjoy.dto.request.UpdateProductRequest;
 import com.shopjoy.dto.response.ProductResponse;
 import com.shopjoy.entity.Product;
 import org.mapstruct.*;
-import org.springframework.stereotype.Component;
 
 /**
  * MapStruct mapper for Product entity and DTOs providing type-safe bean mapping.
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
-@Component
 public interface ProductMapperStruct {
 
     /**
@@ -39,7 +37,6 @@ public interface ProductMapperStruct {
      * @param product the product entity
      * @return the mapped product response
      */
-    @Mapping(target = "productId", source = "id")
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "categoryName", source = "category.categoryName")
     @Mapping(target = "stockQuantity", source = "inventory.quantityInStock")
@@ -49,7 +46,7 @@ public interface ProductMapperStruct {
     /**
      * Maps Product entity to ProductResponse with explicit additional data.
      */
-    @Mapping(target = "productId", source = "product.id")
+    @Mapping(target = "id", source = "product.id")
     @Mapping(target = "categoryId", source = "product.category.id")
     @Mapping(target = "categoryName", source = "product.category.categoryName")
     @Mapping(target = "stockQuantity", source = "inventory.quantityInStock")
@@ -64,7 +61,6 @@ public interface ProductMapperStruct {
      * @param request the update request
      * @param product the product entity to update
      */
-    @Mapping(target = "productId", source = "product.id")
     @Mapping(target = "categoryId", source = "product.category.id")
     @Mapping(target = "categoryName", source = "categoryName")
     @Mapping(target = "stockQuantity", source = "stockQuantity")

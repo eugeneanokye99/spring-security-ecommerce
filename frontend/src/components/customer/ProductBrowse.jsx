@@ -14,7 +14,7 @@ const ProductBrowse = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-    const [sortBy, setSortBy] = useState('product_name');
+    const [sortBy, setSortBy] = useState('productName');
     const [sortDirection, setSortDirection] = useState('ASC');
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -169,8 +169,8 @@ const ProductBrowse = () => {
                                 onChange={(e) => handleSortChange(e.target.value)}
                                 className="w-full appearance-none pl-4 pr-10 py-2 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500 text-sm transition-all"
                             >
-                                <option value="product_name-asc">Name: A to Z</option>
-                                <option value="product_name-desc">Name: Z to A</option>
+                                <option value="productName-asc">Name: A to Z</option>
+                                <option value="productName-desc">Name: Z to A</option>
                                 <option value="price-asc">Price: Low to High</option>
                                 <option value="price-desc">Price: High to Low</option>
                             </select>
@@ -215,7 +215,7 @@ const ProductBrowse = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {products.map((product) => (
                             <div
-                                key={product.productId}
+                                key={product.id}
                                 onClick={() => setSelectedProduct(product)}
                                 className="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
                             >
@@ -252,7 +252,7 @@ const ProductBrowse = () => {
                                             <span className="text-2xl font-black text-gray-900">${product.price.toFixed(2)}</span>
                                         </div>
                                         <button
-                                            onClick={(e) => handleAddToCart(e, product.productId)}
+                                            onClick={(e) => handleAddToCart(e, product.id)}
                                             disabled={product.stockQuantity === 0}
                                             className={`p-3 rounded-xl shadow-lg transition-all duration-300 ${product.stockQuantity === 0
                                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'

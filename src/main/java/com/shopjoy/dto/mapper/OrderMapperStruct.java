@@ -40,7 +40,6 @@ public interface OrderMapperStruct {
     /**
      * Maps Order entity to OrderResponse with additional data.
      */
-    @Mapping(target = "orderId", source = "id")
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "userName", expression = "java(order.getUser() != null ? order.getUser().getFirstName() + \" \" + order.getUser().getLastName() : \"Unknown User\")")
     @Mapping(target = "orderItems", source = "orderItems")
@@ -49,7 +48,6 @@ public interface OrderMapperStruct {
     /**
      * Maps Order entity to OrderResponse with explicit additional data.
      */
-    @Mapping(target = "orderId", source = "order.id")
     @Mapping(target = "userId", source = "order.user.id")
     @Mapping(target = "userName", source = "userName")
     @Mapping(target = "orderItems", source = "orderItems")

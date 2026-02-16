@@ -33,7 +33,7 @@ public class ReviewFieldResolver {
 
         List<ProductResponse> products = productService.getProductsByIds(productIds);
         Map<Integer, ProductResponse> productMap = products.stream()
-                .collect(Collectors.toMap(ProductResponse::getProductId, Function.identity()));
+                .collect(Collectors.toMap(ProductResponse::getId, Function.identity()));
 
         return reviews.stream()
                 .collect(Collectors.toMap(
@@ -51,7 +51,7 @@ public class ReviewFieldResolver {
 
         List<UserResponse> users = userService.getUsersByIds(userIds);
         Map<Integer, UserResponse> userMap = users.stream()
-                .collect(Collectors.toMap(UserResponse::getUserId, Function.identity()));
+                .collect(Collectors.toMap(UserResponse::getId, Function.identity()));
 
         return reviews.stream()
                 .collect(Collectors.toMap(

@@ -47,22 +47,7 @@ public class ProductController {
                 this.productService = productService;
         }
 
-        private String normalizeFieldName(String fieldName) {
-                if (fieldName == null) {
-                        return "productId";
-                }
-                return switch (fieldName) {
-                        case "product_id" -> "productId";
-                        case "product_name" -> "productName";
-                        case "category_id" -> "categoryId";
-                        case "cost_price" -> "costPrice";
-                        case "image_url" -> "imageUrl";
-                        case "is_active" -> "active";
-                        case "created_at" -> "createdAt";
-                        case "updated_at" -> "updatedAt";
-                        default -> fieldName;
-                };
-        }
+
 
         /**
          * Create product response entity.
@@ -337,9 +322,9 @@ public class ProductController {
         public ResponseEntity<ApiResponse<Page<ProductResponse>>> getProductsPaginated(
                         @Parameter(description = "Page number (0-indexed)", example = "0") @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page number cannot be negative") int page,
                         @Parameter(description = "Page size (number of items per page)", example = "10") @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1") @Max(value = 100, message = "Page size cannot exceed 100") int size,
-                        @Parameter(description = "Field to sort by", example = "product_id") @RequestParam(defaultValue = "product_id") String sortBy,
+                        @Parameter(description = "Field to sort by", example = "id") @RequestParam(defaultValue = "id") String sortBy,
                         @Parameter(description = "Sort direction (ASC or DESC)", example = "ASC") @RequestParam(defaultValue = "ASC") String sortDirection) {
-                Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), normalizeFieldName(sortBy));
+                Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
                 Pageable pageable = PageRequest.of(page, size, sort);
                 Page<ProductResponse> response = productService.getProductsPaginated(pageable, sortBy, sortDirection);
                 return ResponseEntity.ok(ApiResponse.success(response, "Products retrieved with pagination"));
@@ -402,7 +387,7 @@ public class ProductController {
                         @Parameter(description = "Filter by active status", example = "true") @RequestParam(required = false) Boolean isActive,
                         @Parameter(description = "Page number (0-indexed)", example = "0") @RequestParam(defaultValue = "0") int page,
                         @Parameter(description = "Page size", example = "10") @RequestParam(defaultValue = "10") int size,
-                        @Parameter(description = "Field to sort by", example = "product_id") @RequestParam(defaultValue = "product_id") String sortBy,
+                        @Parameter(description = "Field to sort by", example = "id") @RequestParam(defaultValue = "id") String sortBy,
                         @Parameter(description = "Sort direction (ASC or DESC)", example = "ASC") @RequestParam(defaultValue = "ASC") String sortDirection) {
 
                 ProductFilter filter = new ProductFilter();
@@ -415,7 +400,7 @@ public class ProductController {
                 filter.setMaxStock(maxStock);
                 filter.setActive(isActive);
 
-                Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), normalizeFieldName(sortBy));
+                Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
                 Pageable pageable = PageRequest.of(page, size, sort);
                 
                 Page<ProductResponse> response = productService.getProductsWithFilters(filter, pageable, sortBy,

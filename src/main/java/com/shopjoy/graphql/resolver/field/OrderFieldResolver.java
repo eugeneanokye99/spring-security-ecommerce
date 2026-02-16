@@ -29,7 +29,7 @@ public class OrderFieldResolver {
 
         List<UserResponse> users = userService.getUsersByIds(userIds);
         Map<Integer, UserResponse> userMap = users.stream()
-                .collect(Collectors.toMap(UserResponse::getUserId, Function.identity()));
+                .collect(Collectors.toMap(UserResponse::getId, Function.identity()));
 
         return orders.stream()
                 .collect(Collectors.toMap(

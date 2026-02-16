@@ -56,7 +56,7 @@ public interface UserMapperStruct {
      * @param user the user entity
      * @return the mapped user response
      */
-    @Mapping(source = "user.id", target = "userId")
+
     UserResponse toUserResponse(User user);
 
     /**

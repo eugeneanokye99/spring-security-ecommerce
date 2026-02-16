@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class CategoryResponse {
     
     @Schema(description = "Category unique identifier", example = "1")
-    private Integer categoryId;
+    private Integer id;
     
     @Schema(description = "Category name", example = "Laptops")
     private String categoryName;

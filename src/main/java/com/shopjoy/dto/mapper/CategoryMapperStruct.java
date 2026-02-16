@@ -38,7 +38,6 @@ public interface CategoryMapperStruct {
      * @param category the category entity
      * @return the mapped category response
      */
-    @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "parentCategoryId", source = "category.parentCategory.id")
     CategoryResponse toCategoryResponse(Category category);
 

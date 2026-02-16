@@ -24,7 +24,7 @@ const ProductDetailModal = ({ product, onClose }) => {
     const loadReviews = async () => {
         try {
             setLoading(true);
-            const response = await getReviewsByProduct(product.productId);
+            const response = await getReviewsByProduct(product.id);
             setReviews(response.data || []);
         } catch (error) {
             console.error('Error loading reviews:', error);
@@ -45,7 +45,7 @@ const ProductDetailModal = ({ product, onClose }) => {
             await createReview({
                 ...newReview,
                 userId: user.userId,
-                productId: product.productId
+                productId: product.id
             });
             setNewReview({ rating: 5, title: '', comment: '' });
             loadReviews();

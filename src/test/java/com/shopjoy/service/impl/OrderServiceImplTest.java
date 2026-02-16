@@ -80,7 +80,7 @@ class OrderServiceImplTest {
         createOrderRequest.setOrderItems(Collections.singletonList(itemRequest));
 
         productResponse = new ProductResponse();
-        productResponse.setProductId(1);
+        productResponse.setId(1);
         productResponse.setProductName("Test Product");
         productResponse.setPrice(50.0);
         productResponse.setActive(true);
@@ -100,13 +100,13 @@ class OrderServiceImplTest {
         
         when(orderRepository.findById(1)).thenReturn(Optional.of(order));
         OrderResponse or = new OrderResponse();
-        or.setOrderId(1);
+        or.setId(1);
         when(orderMapper.toOrderResponse(any(Order.class))).thenReturn(or);
 
         OrderResponse response = orderService.createOrder(createOrderRequest);
 
         assertThat(response).isNotNull();
-        assertThat(response.getOrderId()).isEqualTo(1);
+        assertThat(response.getId()).isEqualTo(1);
         verify(inventoryService).reserveStock(1, 2);
     }
 
@@ -115,13 +115,13 @@ class OrderServiceImplTest {
     void getOrderById_Success() {
         when(orderRepository.findById(1)).thenReturn(Optional.of(order));
         OrderResponse or = new OrderResponse();
-        or.setOrderId(1);
+        or.setId(1);
         when(orderMapper.toOrderResponse(order)).thenReturn(or);
 
         OrderResponse result = orderService.getOrderById(1);
 
         assertThat(result).isNotNull();
-        assertThat(result.getOrderId()).isEqualTo(1);
+        assertThat(result.getId()).isEqualTo(1);
     }
 
     @Test

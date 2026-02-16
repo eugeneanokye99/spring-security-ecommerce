@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class UserResponse {
 
     @Schema(description = "User unique identifier", example = "1")
-    private Integer userId;
+    private Integer id;
     
     @Schema(description = "Username for login", example = "johndoe123")
     private String username;

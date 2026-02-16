@@ -188,13 +188,13 @@ const InventoryManagement = () => {
                             filteredItems.map((item) => {
                                 const status = getStockStatus(item);
                                 return (
-                                    <tr key={item.productId} className="hover:bg-gray-50">
+                                    <tr key={item.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center">
                                                 <Package className="w-5 h-5 text-gray-400 mr-3" />
                                                 <div>
                                                     <span className="text-sm font-medium text-gray-900 block">{item.productName}</span>
-                                                    <span className="text-xs text-gray-500">ID: {item.productId}</span>
+                                                    <span className="text-xs text-gray-500">ID: {item.id}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -219,7 +219,7 @@ const InventoryManagement = () => {
                                         <td className="px-6 py-4 text-sm text-gray-900">{item.reorderLevel}</td>
                                         <td className="px-6 py-4 text-sm text-gray-900">{item.reservedQuantity || 0}</td>
                                         <td className="px-6 py-4 text-right">
-                                            <button onClick={() => handleAddStock(item.productId)} className="btn-primary text-xs px-3 py-1 flex items-center gap-1 ml-auto">
+                                            <button onClick={() => handleAddStock(item.id)} className="btn-primary text-xs px-3 py-1 flex items-center gap-1 ml-auto">
                                                 <Plus className="w-3 h-3" /> Add Stock
                                             </button>
                                         </td>

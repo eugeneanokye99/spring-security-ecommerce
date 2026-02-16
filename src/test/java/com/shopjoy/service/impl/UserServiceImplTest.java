@@ -57,7 +57,7 @@ class UserServiceImplTest {
                 .build();
 
         userResponse = new UserResponse();
-        userResponse.setUserId(1);
+        userResponse.setId(1);
         userResponse.setUsername("testuser");
         userResponse.setEmail("test@example.com");
 
@@ -144,7 +144,7 @@ class UserServiceImplTest {
 
         UserResponse result = userService.getUserById(1);
 
-        assertThat(result.getUserId()).isEqualTo(1);
+        assertThat(result.getId()).isEqualTo(1);
     }
 
     @Test

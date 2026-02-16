@@ -83,7 +83,7 @@ const OrderHistory = () => {
 
     const handleEditOrder = (order) => {
         console.log('Editing order:', order);
-        setEditingOrder(order.orderId);
+        setEditingOrder(order.id);
         setEditForm({
             shippingAddress: order.shippingAddress || '',
             paymentMethod: order.paymentMethod || 'CASH',
@@ -92,7 +92,7 @@ const OrderHistory = () => {
                 const unitPrice = item.unitPrice || item.price || (item.subtotal / item.quantity) || 0;
                 return {
                     orderItemId: item.orderItemId,
-                    productId: item.productId,
+                    productId: item.id,
                     productName: item.productName || 'Unknown Product',
                     quantity: item.quantity || 1,
                     price: unitPrice
@@ -109,7 +109,7 @@ const handleUpdateOrder = async (orderId) => {
             notes: editForm.notes,
             orderItems: editForm.orderItems.map(item => ({
                 orderItemId: item.orderItemId,
-                productId: item.productId,
+                productId: item.id,
                 quantity: item.quantity,
                 price: item.price
             }))
@@ -250,7 +250,7 @@ const handleUpdateOrder = async (orderId) => {
                         >
                             <option value="orderDate">Order Date</option>
                             <option value="totalAmount">Total Amount</option>
-                            <option value="orderId">Order ID</option>
+                            <option value="id">Order ID</option>
                         </select>
                         
                         <button
@@ -273,10 +273,10 @@ const handleUpdateOrder = async (orderId) => {
             ) : (
                 <div className="space-y-4">
                     {orders.map((order) => (
-                        <div key={order.orderId} className="card p-6">
-                            {editingOrder === order.orderId ? (
+                        <div key={order.id} className="card p-6">
+                            {editingOrder === order.id ? (
                                 <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold text-gray-900">Edit Order #{order.orderId}</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900">Edit Order #{order.id}</h3>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
@@ -378,7 +378,7 @@ const handleUpdateOrder = async (orderId) => {
 
                                     <div className="flex gap-2">
                                         <button
-                                            onClick={() => handleUpdateOrder(order.orderId)}
+                                            onClick={() => handleUpdateOrder(order.id)}
                                             className="btn-primary"
                                         >
                                             Save Changes
@@ -395,7 +395,7 @@ const handleUpdateOrder = async (orderId) => {
                                 <>
                                     <div className="flex items-center justify-between mb-4">
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">Order #{order.orderId}</h3>
+                                            <h3 className="text-lg font-semibold text-gray-900">Order #{order.id}</h3>
                                             <p className="text-sm text-gray-600">
                                                 {new Date(order.orderDate).toLocaleDateString('en-US', {
                                                     year: 'numeric',
@@ -426,14 +426,14 @@ const handleUpdateOrder = async (orderId) => {
                                                         <Edit className="w-5 h-5" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleCancelOrder(order.orderId)}
+                                                        onClick={() => handleCancelOrder(order.id)}
                                                         className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition"
                                                         title="Cancel Order"
                                                     >
                                                         <X className="w-5 h-5" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDeleteOrder(order.orderId)}
+                                                        onClick={() => handleDeleteOrder(order.id)}
                                                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                                                         title="Delete Order"
                                                     >

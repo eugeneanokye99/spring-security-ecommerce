@@ -42,6 +42,6 @@ class UserServiceIntegrationTest {
         UserResponse authenticatedUser = userService.authenticateUser("integration_user", "Password123");
 
         assertThat(authenticatedUser).isNotNull();
-        assertThat(authenticatedUser.getUserId()).isEqualTo(registeredUser.getUserId());
+        assertThat(authenticatedUser.getId()).isEqualTo(registeredUser.getId());
     }
 }

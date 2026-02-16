@@ -43,7 +43,7 @@ class CategoryServiceImplTest {
                 .build();
 
         categoryResponse = new CategoryResponse();
-        categoryResponse.setCategoryId(1);
+        categoryResponse.setId(1);
         categoryResponse.setCategoryName("Electronics");
     }
 
@@ -55,7 +55,7 @@ class CategoryServiceImplTest {
         CategoryResponse result = categoryService.getCategoryById(1);
 
         assertThat(result).isNotNull();
-        assertThat(result.getCategoryId()).isEqualTo(1);
+        assertThat(result.getId()).isEqualTo(1);
     }
 
     @Test

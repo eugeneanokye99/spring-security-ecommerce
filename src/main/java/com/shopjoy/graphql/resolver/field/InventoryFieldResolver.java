@@ -29,7 +29,7 @@ public class InventoryFieldResolver {
 
         List<ProductResponse> products = productService.getProductsByIds(productIds);
         Map<Integer, ProductResponse> productMap = products.stream()
-                .collect(Collectors.toMap(ProductResponse::getProductId, Function.identity()));
+                .collect(Collectors.toMap(ProductResponse::getId, Function.identity()));
 
         return inventories.stream()
                 .collect(Collectors.toMap(

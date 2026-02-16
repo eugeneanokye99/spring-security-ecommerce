@@ -114,7 +114,7 @@ const ProductManagement = () => {
             };
 
             if (editingProduct) {
-                await updateProduct(editingProduct.productId, productData);
+                await updateProduct(editingProduct.id, productData);
                 showSuccessToast('Product updated successfully!');
             } else {
                 await createProduct(productData);
@@ -173,10 +173,10 @@ const ProductManagement = () => {
     const handleToggleActive = async (product) => {
         try {
             if (product.active) {
-                await deactivateProduct(product.productId);
+                await deactivateProduct(product.id);
                 showSuccessToast('Product deactivated successfully!');
             } else {
-                await activateProduct(product.productId);
+                await activateProduct(product.id);
                 showSuccessToast('Product activated successfully!');
             }
             loadProducts();
@@ -322,13 +322,13 @@ const ProductManagement = () => {
                             value={`${sortBy}-${sortDirection.toLowerCase()}`}
                             className="w-full appearance-none pl-4 pr-10 py-2 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-primary-500 text-sm"
                         >
-                            <option value="product_id-asc">ID: Low to High</option>
-                            <option value="product_id-desc">ID: High to Low</option>
-                            <option value="product_name-asc">Name: A to Z</option>
-                            <option value="product_name-desc">Name: Z to A</option>
+                            <option value="id-asc">ID: Low to High</option>
+                            <option value="id-desc">ID: High to Low</option>
+                            <option value="productName-asc">Name: A to Z</option>
+                            <option value="productName-desc">Name: Z to A</option>
                             <option value="price-asc">Price: Low to High</option>
                             <option value="price-desc">Price: High to Low</option>
-                            <option value="category_id-asc">Category: A to Z</option>
+                            <option value="category.id-desc">Category: Z to A</option>
                         </select>
                     </div>
                     

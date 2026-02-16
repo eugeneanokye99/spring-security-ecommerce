@@ -29,7 +29,7 @@ public class ProductFieldResolver {
 
         List<CategoryResponse> categories = categoryService.getCategoriesByIds(categoryIds);
         Map<Integer, CategoryResponse> categoryMap = categories.stream()
-                .collect(Collectors.toMap(CategoryResponse::getCategoryId, Function.identity()));
+                .collect(Collectors.toMap(CategoryResponse::getId, Function.identity()));
 
         return products.stream()
                 .collect(Collectors.toMap(

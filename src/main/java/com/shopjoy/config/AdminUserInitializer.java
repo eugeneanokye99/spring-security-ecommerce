@@ -77,7 +77,7 @@ public class AdminUserInitializer implements CommandLineRunner {
             UserResponse createdUser = createAdminUser();
             log.info("Successfully created admin user: {} (ID: {}, Email: {})",
                     createdUser.getUsername(),
-                    createdUser.getUserId(),
+                    createdUser.getId(),
                     createdUser.getEmail());
             
         } catch (DuplicateResourceException e) {

@@ -21,7 +21,7 @@ import java.util.List;
 public class OrderResponse {
 
     @Schema(description = "Order unique identifier", example = "1")
-    private Integer orderId;
+    private Integer id;
 
     @Schema(description = "User ID who placed the order", example = "1")
     private Integer userId;

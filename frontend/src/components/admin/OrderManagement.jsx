@@ -148,7 +148,7 @@ const OrderManagement = () => {
                     >
                         <option value="orderDate">Date</option>
                         <option value="totalAmount">Amount</option>
-                        <option value="orderId">ID</option>
+                        <option value="id">ID</option>
                     </select>
 
                     <button
@@ -192,7 +192,7 @@ const OrderManagement = () => {
                         ) : (
                             orders.map((order) => (
                                 <>
-                                    <tr key={order.orderId} className="hover:bg-gray-50/50 transition-colors group border-b border-gray-100">
+                                    <tr key={order.id} className="hover:bg-gray-50/50 transition-colors group border-b border-gray-100">
                                         <td className="px-6 py-5">
                                             <div className="flex flex-col">
                                                 <div className="flex items-center gap-2">

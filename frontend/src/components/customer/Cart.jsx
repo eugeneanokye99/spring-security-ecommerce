@@ -73,7 +73,7 @@ const Cart = () => {
 
         try {
             const orderItems = cartItems.map((item) => ({
-                productId: item.productId,
+                productId: item.id,
                 quantity: item.quantity,
                 price: item.productPrice,
             }));

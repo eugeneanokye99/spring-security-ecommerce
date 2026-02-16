@@ -33,7 +33,7 @@ public class CategoryFieldResolver {
 
         List<CategoryResponse> parents = categoryService.getCategoriesByIds(parentIds);
         Map<Integer, CategoryResponse> parentMap = parents.stream()
-                .collect(Collectors.toMap(CategoryResponse::getCategoryId, Function.identity()));
+                .collect(Collectors.toMap(CategoryResponse::getId, Function.identity()));
 
         return categories.stream()
                 .collect(Collectors.toMap(
@@ -45,7 +45,7 @@ public class CategoryFieldResolver {
     @BatchMapping(typeName = "Category", field = "products")
     public Map<CategoryResponse, List<ProductResponse>> products(List<CategoryResponse> categories) {
         List<Integer> categoryIds = categories.stream()
-                .map(CategoryResponse::getCategoryId)
+                .map(CategoryResponse::getId)
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -57,7 +57,7 @@ public class CategoryFieldResolver {
         return categories.stream()
                 .collect(Collectors.toMap(
                         category -> category,
-                        category -> productsByCategory.getOrDefault(category.getCategoryId(), java.util.Collections.emptyList())
+                        category -> productsByCategory.getOrDefault(category.getId(), java.util.Collections.emptyList())
                 ));
     }
 }

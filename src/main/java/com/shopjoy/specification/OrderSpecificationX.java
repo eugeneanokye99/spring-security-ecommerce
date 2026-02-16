@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderSpecification {
+public class OrderSpecificationX {
 
     public static Specification<Order> withFilters(Integer userId, OrderFilter filter) {
         return (root, query, cb) -> {

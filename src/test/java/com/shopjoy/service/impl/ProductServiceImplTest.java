@@ -55,7 +55,7 @@ class ProductServiceImplTest {
                 .build();
 
         productResponse = new ProductResponse();
-        productResponse.setProductId(1);
+        productResponse.setId(1);
         productResponse.setProductName("Test Product");
         productResponse.setPrice(100.0);
 
@@ -79,7 +79,7 @@ class ProductServiceImplTest {
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getProductId()).isEqualTo(1);
+        assertThat(result.getId()).isEqualTo(1);
         verify(productRepository).findById(1);
     }
 

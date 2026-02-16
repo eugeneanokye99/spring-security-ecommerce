@@ -80,7 +80,7 @@ class CartServiceImplTest {
     @DisplayName("Add to Cart - Success (New Item)")
     void addToCart_Success_NewItem() {
         ProductResponse pr = new ProductResponse();
-        pr.setProductId(1);
+        pr.setId(1);
         when(productService.getProductById(1)).thenReturn(pr);
         when(cartItemRepository.findByUser_IdAndProduct_Id(1, 1)).thenReturn(Optional.empty());
         when(inventoryService.hasAvailableStock(1, 2)).thenReturn(true);
@@ -99,7 +99,7 @@ class CartServiceImplTest {
     @DisplayName("Add to Cart - Success (Existing Item Update)")
     void addToCart_Success_ExistingItem() {
         ProductResponse pr = new ProductResponse();
-        pr.setProductId(1);
+        pr.setId(1);
         when(productService.getProductById(1)).thenReturn(pr);
         when(cartItemRepository.findByUser_IdAndProduct_Id(1, 1)).thenReturn(Optional.of(cartItem));
         when(inventoryService.hasAvailableStock(1, 2)).thenReturn(true);

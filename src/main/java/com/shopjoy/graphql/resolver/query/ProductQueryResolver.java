@@ -23,6 +23,8 @@ public class ProductQueryResolver {
         this.productService = productService;
     }
 
+
+
     @QueryMapping
     public ProductResponse product(@Argument Long id) {
         return productService.getProductById(id.intValue());
