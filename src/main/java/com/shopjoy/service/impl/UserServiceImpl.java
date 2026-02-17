@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userMapper.toUser(request);
-        // Hash the password with BCrypt before saving
         user.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
@@ -76,9 +75,7 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateResourceException("User", "email", request.getEmail());
         }
 
-        // Use the mapper method that accepts userType parameter
         User user = userMapper.toUser(request, userType);
-        // Hash the password with BCrypt before saving
         user.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
@@ -106,7 +103,6 @@ public class UserServiceImpl implements UserService {
 
         User user = userOpt.get();
         
-        // Verify password using BCrypt
         if (!BCrypt.checkpw(password, user.getPasswordHash())) {
             throw new AuthenticationException();
         }
@@ -129,7 +125,6 @@ public class UserServiceImpl implements UserService {
             return java.util.Collections.emptyList();
         }
         
-        // Remove duplicates and call repository
         List<Integer> distinctIds = userIds.stream()
                 .distinct()
                 .filter(java.util.Objects::nonNull)
@@ -189,7 +184,6 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // Apply updates
         userMapper.updateUserFromRequest(request, existingUser);
         existingUser.setUpdatedAt(LocalDateTime.now());
 
@@ -210,7 +204,6 @@ public class UserServiceImpl implements UserService {
 
         validatePassword(newPassword);
 
-        // Hash the new password before saving
         String hashedNewPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         user.setPasswordHash(hashedNewPassword);
         userRepository.save(user);

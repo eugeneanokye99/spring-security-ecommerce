@@ -72,14 +72,12 @@ public class OrderServiceImpl implements OrderService {
             throw new ValidationException("Order must have at least one item");
         }
 
-        // Fetch all products once and cache them
         Map<Integer, ProductResponse> productCache = new HashMap<>();
         for (CreateOrderItemRequest itemReq : request.getOrderItems()) {
             ProductResponse product = productService.getProductById(itemReq.getProductId());
             productCache.put(itemReq.getProductId(), product);
         }
 
-        // Validate products and inventory
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (CreateOrderItemRequest itemReq : request.getOrderItems()) {
             ProductResponse product = productCache.get(itemReq.getProductId());
@@ -89,18 +87,15 @@ public class OrderServiceImpl implements OrderService {
             if (!inventoryService.hasAvailableStock(itemReq.getProductId(), itemReq.getQuantity())) {
                 throw new ValidationException("Insufficient stock for product: " + product.getProductName());
             }
-            // Calculate total amount from actual product prices
             BigDecimal itemTotal = BigDecimal.valueOf(product.getPrice())
                     .multiply(BigDecimal.valueOf(itemReq.getQuantity()));
             totalAmount = totalAmount.add(itemTotal);
         }
 
-        // Reserve inventory
         for (CreateOrderItemRequest itemReq : request.getOrderItems()) {
             inventoryService.reserveStock(itemReq.getProductId(), itemReq.getQuantity());
         }
 
-        // Create the order
         Order order = orderMapper.toOrder(request);
         order.setUser(userRepository.getReferenceById(request.getUserId()));
         order.setTotalAmount(totalAmount);
@@ -108,7 +103,6 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setPaymentStatus(PaymentStatus.UNPAID);
         
-        // Set default payment method if not provided
         if (order.getPaymentMethod() == null || order.getPaymentMethod().trim().isEmpty()) {
             order.setPaymentMethod("CASH");
         }
@@ -116,10 +110,8 @@ public class OrderServiceImpl implements OrderService {
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
 
-        // Save order first to generate order ID and handle common fields
         Order createdOrder = orderRepository.save(order);
 
-        // Create order items using cached product prices and link to the saved order
         for (CreateOrderItemRequest itemReq : request.getOrderItems()) {
             ProductResponse product = productCache.get(itemReq.getProductId());
             BigDecimal unitPrice = BigDecimal.valueOf(product.getPrice());
@@ -136,7 +128,6 @@ public class OrderServiceImpl implements OrderService {
             orderItemRepository.save(orderItem);
         }
 
-        // Return refreshed order with items
         return getOrderById(createdOrder.getId());
     }
 
@@ -359,7 +350,6 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
             "update (can only update PENDING orders)");
     }
 
-    // Update basic order fields
     if (request.getShippingAddress() != null && !request.getShippingAddress().trim().isEmpty()) {
         order.setShippingAddress(request.getShippingAddress());
     }
@@ -372,21 +362,17 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
         order.setNotes(request.getNotes());
     }
 
-    // Handle order items if provided
     if (request.getOrderItems() != null && !request.getOrderItems().isEmpty()) {
         List<OrderItem> existingItems = orderItemRepository.findByOrder_Id(orderId);
         
-        // Release inventory for old items
         for (OrderItem item : existingItems) {
             inventoryService.releaseStock(item.getProduct().getId(), item.getQuantity());
         }
 
-        // Delete old items
         for (OrderItem item : existingItems) {
             orderItemRepository.deleteById(item.getId());
         }
 
-        // Validate and reserve inventory for new items
         double newTotal = 0.0;
         for (UpdateOrderItemRequest itemReq : request.getOrderItems()) {
             ProductResponse product = productService.getProductById(itemReq.getProductId());
@@ -400,7 +386,6 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
             newTotal += itemReq.getPrice() * itemReq.getQuantity();
         }
 
-        // Create new order items
         for (UpdateOrderItemRequest itemReq : request.getOrderItems()) {
             OrderItem orderItem = OrderItem.builder()
                     .order(order)
@@ -412,11 +397,8 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
                     .build();
             orderItemRepository.save(orderItem);
         }
-
-        // Update total amount
         order.setTotalAmount(new BigDecimal(newTotal));
     }
-
     order.setUpdatedAt(LocalDateTime.now());
     Order updatedOrder = orderRepository.save(order);
     
@@ -511,14 +493,11 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
             throw new InvalidOrderStateException(orderId, "CANCELLED", "process payment");
         }
 
-        // Simulate payment gateway interaction or logging the transaction ID
         order.setPaymentStatus(PaymentStatus.PAID);
         order.setUpdatedAt(LocalDateTime.now());
         
-        // Save initial state before transition
         orderRepository.save(order);
 
-        // Chain status update - this happens within the same transaction context
         return confirmOrder(orderId);
     }
 
@@ -532,18 +511,13 @@ public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
             throw new ValidationException("Simulation: Order " + orderId + " is already paid.");
         }
 
-        // 1. Update Payment Status (First step of the transaction)
         order.setPaymentStatus(PaymentStatus.PAID);
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
 
-        // 2. Demonstration of Rollback
-        // Trigger failure if transactionId starts with "FAIL-"
         if (transactionId != null && transactionId.startsWith("FAIL-")) {
             throw new RuntimeException("Simulated payment gateway failure for order " + orderId);
         }
-
-        // 3. Update Order Status (Final step) - transition to PROCESSING
         return confirmOrder(orderId);
     }
 }

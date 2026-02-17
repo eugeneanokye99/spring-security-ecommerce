@@ -85,7 +85,6 @@ public class AddressServiceImpl implements AddressService {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
         
-        // Find existing default and unset it
         addressRepository.findByUser_IdAndIsDefaultTrue(address.getUser().getId())
                 .ifPresent(currentDefault -> {
                     currentDefault.setDefault(false);

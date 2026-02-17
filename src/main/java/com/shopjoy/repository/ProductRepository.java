@@ -43,19 +43,5 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, JpaS
             @Param("brand") String brand,
             @Param("active") Boolean active,
             Pageable pageable);
-    
-    @Query("SELECT p FROM Product p WHERE " +
-           "(COALESCE(:searchTerm, '') = '' OR LOWER(p.productName) LIKE LOWER(CONCAT('%', COALESCE(:searchTerm, ''), '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', COALESCE(:searchTerm, ''), '%'))) AND " +
-           "(:categoryId IS NULL OR p.category.id = :categoryId) AND " +
-           "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
-           "(:maxPrice IS NULL OR p.price <= :maxPrice) AND " +
-           "(:brand IS NULL OR p.brand = :brand) AND " +
-           "(:active IS NULL OR p.active = :active)")
-    List<Product> findAllWithFilters(
-            @Param("searchTerm") String searchTerm,
-            @Param("categoryId") Integer categoryId,
-            @Param("minPrice") Double minPrice,
-            @Param("maxPrice") Double maxPrice,
-            @Param("brand") String brand,
-            @Param("active") Boolean active);
+
 }

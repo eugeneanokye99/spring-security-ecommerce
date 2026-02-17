@@ -60,7 +60,6 @@ public class ProductServiceImpl implements ProductService {
 
         Product createdProduct = productRepository.save(product);
 
-        // Create initial inventory entry
         com.shopjoy.entity.Inventory inventory = new com.shopjoy.entity.Inventory();
         inventory.setProduct(createdProduct);
         inventory.setQuantityInStock(request.getInitialStock() != null ? request.getInitialStock() : 0);
@@ -289,7 +288,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponse> getProductsWithFilters(ProductFilter filter, Pageable pageable, String sortBy,
             String sortDirection) {
-        // Handle null filter by creating an empty one
         if (filter == null) {
             filter = ProductFilter.builder().build();
         }
@@ -299,7 +297,6 @@ public class ProductServiceImpl implements ProductService {
             throw new ValidationException("minPrice", "must be less than or equal to maxPrice");
         }
 
-        // Default database sorting/pagination
         Page<Product> productPage = productRepository.findWithFilters(
                 filter.getSearchTerm(),
                 filter.getCategoryId(),
