@@ -11,9 +11,9 @@ import com.shopjoy.entity.UserType;
 import com.shopjoy.exception.AuthenticationException;
 import com.shopjoy.exception.DuplicateResourceException;
 import com.shopjoy.exception.ResourceNotFoundException;
-import com.shopjoy.exception.ValidationException;
 import com.shopjoy.repository.UserRepository;
 import com.shopjoy.service.AuthService;
+import com.shopjoy.util.AuthValidationUtil;
 import lombok.AllArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Auditable(action = "USER_REGISTRATION", description = "Registering new user")
     public UserResponse registerUser(CreateUserRequest request) {
-        validateCreateUserRequest(request);
+        AuthValidationUtil.validateCreateUserRequest(request);
 
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("User", "username", request.getUsername());
@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Auditable(action = "USER_REGISTRATION", description = "Registering new user with specific type")
     public UserResponse registerUser(CreateUserRequest request, UserType userType) {
-        validateCreateUserRequest(request);
+        AuthValidationUtil.validateCreateUserRequest(request);
 
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("User", "username", request.getUsername());
@@ -83,13 +83,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserResponse login(LoginRequest request) {
-        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
-            throw new ValidationException("Username cannot be empty");
-        }
-
-        if (request.getPassword() == null || request.getPassword().isEmpty()) {
-            throw new ValidationException("Password cannot be empty");
-        }
+        AuthValidationUtil.validateLoginRequest(request);
 
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
 
@@ -116,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthenticationException("Current password is incorrect");
         }
 
-        validatePassword(request.getNewPassword());
+        AuthValidationUtil.validatePassword(request.getNewPassword());
 
         String hashedNewPassword = BCrypt.hashpw(request.getNewPassword(), BCrypt.gensalt());
         user.setPasswordHash(hashedNewPassword);
@@ -132,51 +126,5 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean isUsernameTaken(String username) {
         return userRepository.existsByUsername(username);
-    }
-
-    private void validateCreateUserRequest(CreateUserRequest request) {
-        if (request == null) {
-            throw new ValidationException("User data cannot be null");
-        }
-
-        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
-            throw new ValidationException("username", "must not be empty");
-        }
-
-        if (request.getUsername().length() < 3 || request.getUsername().length() > 50) {
-            throw new ValidationException("username", "must be between 3 and 50 characters");
-        }
-
-        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            throw new ValidationException("email", "must not be empty");
-        }
-
-        if (!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            throw new ValidationException("email", "must be a valid email address");
-        }
-
-        validatePassword(request.getPassword());
-    }
-
-    private void validatePassword(String password) {
-        if (password == null || password.isEmpty()) {
-            throw new ValidationException("password", "must not be empty");
-        }
-
-        if (password.length() < 8) {
-            throw new ValidationException("password", "must be at least 8 characters long");
-        }
-
-        if (!password.matches(".*[A-Z].*")) {
-            throw new ValidationException("password", "must contain at least one uppercase letter");
-        }
-
-        if (!password.matches(".*[a-z].*")) {
-            throw new ValidationException("password", "must contain at least one lowercase letter");
-        }
-
-        if (!password.matches(".*\\d.*")) {
-            throw new ValidationException("password", "must contain at least one digit");
-        }
     }
 }
