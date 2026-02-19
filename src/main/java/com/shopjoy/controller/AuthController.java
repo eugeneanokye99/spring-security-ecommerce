@@ -5,6 +5,7 @@ import com.shopjoy.dto.request.CreateUserRequest;
 import com.shopjoy.dto.request.LoginRequest;
 import com.shopjoy.dto.response.ApiResponse;
 import com.shopjoy.dto.response.UserResponse;
+import com.shopjoy.entity.UserType;
 import com.shopjoy.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -70,7 +71,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> register(
             @Valid @RequestBody CreateUserRequest request) {
-        UserResponse response = authService.registerUser(request);
+        UserResponse response = authService.registerUser(request, UserType.CUSTOMER);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "User registered successfully"));
     }
