@@ -33,6 +33,9 @@ public class ProductResponse {
     @Schema(description = "Current stock quantity", example = "50")
     private int stockQuantity;
 
+    @Schema(description = "Stock reorder level threshold", example = "10")
+    private int reorderLevel;
+
     @Schema(description = "Product selling price", example = "1299.99")
     private double price;
 

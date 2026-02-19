@@ -16,6 +16,9 @@ import com.shopjoy.service.InventoryService;
 import com.shopjoy.service.ProductService;
 import lombok.AllArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +44,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "cartItems", key = "#request.userId"),
+        @CacheEvict(value = "cartTotal", key = "#request.userId"),
+        @CacheEvict(value = "cartCount", key = "#request.userId")
+    })
     public CartItemResponse addToCart(AddToCartRequest request) {
         if (request.getQuantity() <= 0) {
             throw new ValidationException("quantity", "must be positive");
@@ -52,7 +60,7 @@ public class CartServiceImpl implements CartService {
             throw new InsufficientStockException(request.getProductId(), request.getQuantity(), 0);
         }
 
-        Optional<CartItem> existingItem = cartItemRepository.findByUser_IdAndProduct_Id(request.getUserId(),
+        Optional<CartItem> existingItem = cartItemRepository.findByUserIdAndProductId(request.getUserId(),
                 request.getProductId());
 
         if (existingItem.isPresent()) {
@@ -80,6 +88,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "cartItems", allEntries = true),
+        @CacheEvict(value = "cartTotal", allEntries = true),
+        @CacheEvict(value = "cartCount", allEntries = true)
+    })
     public CartItemResponse updateCartItemQuantity(Integer cartItemId, int newQuantity) {
         if (newQuantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
@@ -99,6 +112,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "cartItems", allEntries = true),
+        @CacheEvict(value = "cartTotal", allEntries = true),
+        @CacheEvict(value = "cartCount", allEntries = true)
+    })
     public void removeFromCart(Integer cartItemId) {
         if (!cartItemRepository.existsById(cartItemId)) {
             throw new ResourceNotFoundException("CartItem", "id", cartItemId);
@@ -108,8 +126,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Cacheable(value = "cartItems", key = "#userId", cacheManager = "shortCacheManager")
     public List<CartItemResponse> getCartItems(Integer userId) {
-        List<CartItem> items = cartItemRepository.findByUser_Id(userId);
+        List<CartItem> items = cartItemRepository.findByUserId(userId);
         return items.stream()
                 .map(cartItemMapper::toCartItemResponse)
                 .collect(Collectors.toList());
@@ -117,13 +136,19 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "cartItems", key = "#userId"),
+        @CacheEvict(value = "cartTotal", key = "#userId"),
+        @CacheEvict(value = "cartCount", key = "#userId")
+    })
     public void clearCart(Integer userId) {
-        cartItemRepository.deleteByUser_Id(userId);
+        cartItemRepository.deleteByUserId(userId);
     }
 
     @Override
+    @Cacheable(value = "cartTotal", key = "#userId", cacheManager = "shortCacheManager")
     public double getCartTotal(Integer userId) {
-        List<CartItem> items = cartItemRepository.findByUser_Id(userId);
+        List<CartItem> items = cartItemRepository.findByUserId(userId);
 
         return items.stream()
                 .mapToDouble(item -> {
@@ -134,8 +159,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Cacheable(value = "cartCount", key = "#userId", cacheManager = "shortCacheManager")
     public int getCartItemCount(Integer userId) {
-        List<CartItem> items = cartItemRepository.findByUser_Id(userId);
+        List<CartItem> items = cartItemRepository.findByUserId(userId);
         return items.stream()
                 .mapToInt(CartItem::getQuantity)
                 .sum();

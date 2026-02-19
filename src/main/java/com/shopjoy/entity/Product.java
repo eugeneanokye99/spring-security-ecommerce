@@ -22,6 +22,17 @@ import java.util.List;
 @Entity
 @Table(name = "products")
 @BatchSize(size = 20)
+@NamedEntityGraph(
+    name = "Product.withInventory",
+    attributeNodes = @NamedAttributeNode("inventory")
+)
+@NamedEntityGraph(
+    name = "Product.withInventoryAndCategory",
+    attributeNodes = {
+        @NamedAttributeNode("inventory"),
+        @NamedAttributeNode("category")
+    }
+)
 public class Product implements Serializable {
 
     @Serial

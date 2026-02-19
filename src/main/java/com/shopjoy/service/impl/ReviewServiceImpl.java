@@ -15,6 +15,9 @@ import com.shopjoy.repository.UserRepository;
 import com.shopjoy.service.ReviewService;
 
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,8 +43,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "reviews", allEntries = true),
+        @CacheEvict(value = "reviewsByProduct", key = "#request.productId"),
+        @CacheEvict(value = "reviewsByUser", key = "#request.userId"),
+        @CacheEvict(value = "productRating", key = "#request.productId")
+    })
     public ReviewResponse createReview(CreateReviewRequest request) {
-        if (reviewRepository.existsByUser_IdAndProduct_Id(request.getUserId(), request.getProductId())) {
+        if (reviewRepository.existsByUserIdAndProductId(request.getUserId(), request.getProductId())) {
             throw new BusinessException("User has already reviewed this product");
         }
 
@@ -67,6 +76,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Cacheable(value = "review", key = "#reviewId", unless = "#result == null")
     public ReviewResponse getReviewById(Integer reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "id", reviewId));
@@ -74,21 +84,30 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Cacheable(value = "reviewsByProduct", key = "#productId")
     public List<ReviewResponse> getReviewsByProduct(Integer productId) {
-        return reviewRepository.findByProduct_Id(productId).stream()
+        return reviewRepository.findByProductId(productId).stream()
                 .map(reviewMapper::toReviewResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Cacheable(value = "reviewsByUser", key = "#userId")
     public List<ReviewResponse> getReviewsByUser(Integer userId) {
-        return reviewRepository.findByUser_Id(userId).stream()
+        return reviewRepository.findByUserId(userId).stream()
                 .map(reviewMapper::toReviewResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "review", key = "#reviewId"),
+        @CacheEvict(value = "reviews", allEntries = true),
+        @CacheEvict(value = "reviewsByProduct", allEntries = true),
+        @CacheEvict(value = "reviewsByUser", allEntries = true),
+        @CacheEvict(value = "productRating", allEntries = true)
+    })
     public ReviewResponse updateReview(Integer reviewId, UpdateReviewRequest request) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "id", reviewId));
@@ -102,6 +121,13 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "review", key = "#reviewId"),
+        @CacheEvict(value = "reviews", allEntries = true),
+        @CacheEvict(value = "reviewsByProduct", allEntries = true),
+        @CacheEvict(value = "reviewsByUser", allEntries = true),
+        @CacheEvict(value = "productRating", allEntries = true)
+    })
     public void deleteReview(Integer reviewId) {
         if (!reviewRepository.existsById(reviewId)) {
             throw new ResourceNotFoundException("Review", "id", reviewId);
@@ -115,19 +141,21 @@ public class ReviewServiceImpl implements ReviewService {
         if (rating < 1 || rating > 5) {
             throw new ValidationException("rating", "must be between 1 and 5");
         }
-        return reviewRepository.findByProduct_Id(productId).stream()
+        return reviewRepository.findByProductId(productId).stream()
                 .filter(review -> review.getRating() == rating)
                 .map(reviewMapper::toReviewResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Cacheable(value = "productRating", key = "#productId")
     public double getAverageRating(Integer productId) {
         return reviewRepository.getAverageRating(productId);
     }
 
     @Override
     @Transactional()
+    @CacheEvict(value = "review", key = "#reviewId")
     public ReviewResponse markReviewAsHelpful(Integer reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "id", reviewId));
@@ -138,6 +166,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Cacheable(value = "reviews")
     public List<ReviewResponse> getAllReviews() {
         return reviewRepository.findAll().stream()
                 .map(reviewMapper::toReviewResponse)

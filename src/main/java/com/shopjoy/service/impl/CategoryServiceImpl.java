@@ -80,7 +80,8 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(categoryMapper::toCategoryResponse)
                 .toList();
     }
-    
+
+
     @Override
     @Cacheable(value = "categories")
     public List<CategoryResponse> getAllCategories() {
@@ -88,7 +89,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(categoryMapper::toCategoryResponse)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Cacheable(value = "topLevelCategories")
     public List<CategoryResponse> getTopLevelCategories() {
@@ -113,7 +114,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryId == null) {
             throw new ValidationException("Category ID cannot be null");
         }
-        return categoryRepository.existsByParentCategory_Id(categoryId);
+        return categoryRepository.existsByParentCategoryId(categoryId);
     }
     
     @Override

@@ -80,7 +80,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "products")
     public List<ProductResponse> getProductsByIds(List<Integer> productIds) {
         if (productIds == null || productIds.isEmpty()) {
             return Collections.emptyList();
@@ -91,14 +90,15 @@ public class ProductServiceImpl implements ProductService {
                 .filter(Objects::nonNull)
                 .toList();
         
-        List<Product> products = productRepository.findAllById(distinctIds);
-        return products.stream().map(productMapper::toProductResponse).collect(Collectors.toList());
+        return distinctIds.stream()
+                .map(this::getProductById)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Cacheable(value = "products")
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
+        return productRepository.findAllWithInventory().stream()
                 .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
@@ -106,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Cacheable(value = "activeProducts")
     public List<ProductResponse> getActiveProducts() {
-        return productRepository.findAll().stream()
+        return productRepository.findAllWithInventory().stream()
                 .filter(Product::isActive)
                 .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
@@ -118,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
         if (categoryId == null) {
             throw new ValidationException("Category ID cannot be null");
         }
-        return productRepository.findByCategory_Id(categoryId).stream()
+        return productRepository.findByCategoryId(categoryId).stream()
                 .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
@@ -129,7 +129,7 @@ public class ProductServiceImpl implements ProductService {
         if (categoryIds == null || categoryIds.isEmpty()) {
             return Collections.emptyList();
         }
-        return productRepository.findByCategory_IdIn(categoryIds).stream()
+        return productRepository.findByCategoryIdIn(categoryIds).stream()
                 .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
@@ -139,7 +139,7 @@ public class ProductServiceImpl implements ProductService {
         if (keyword == null || keyword.trim().isEmpty()) {
             throw new ValidationException("Search keyword cannot be empty");
         }
-        return productRepository.findByProductNameContainingIgnoreCase(keyword).stream()
+        return productRepository.findByProductName(keyword).stream()
                 .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
@@ -256,12 +256,12 @@ public class ProductServiceImpl implements ProductService {
         if (categoryId == null) {
             throw new ValidationException("Category ID cannot be null");
         }
-        return productRepository.countByCategory_Id(categoryId);
+        return productRepository.countByCategoryId(categoryId);
     }
 
     @Override
     public Page<ProductResponse> getProductsPaginated(Pageable pageable, String sortBy, String sortDirection) {
-        Page<Product> productPage = productRepository.findAll(pageable);
+        Page<Product> productPage = productRepository.findAllWithInventory(pageable);
 
         List<ProductResponse> responseList = productPage.getContent().stream()
                 .map(productMapper::toProductResponse)
@@ -276,7 +276,7 @@ public class ProductServiceImpl implements ProductService {
             throw new ValidationException("Search keyword cannot be empty");
         }
 
-        Page<Product> productPage = productRepository.findByProductNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword, pageable);
+        Page<Product> productPage = productRepository.findByProductCategory(keyword, keyword, pageable);
 
         List<ProductResponse> responseList = productPage.getContent().stream()
                 .map(productMapper::toProductResponse)

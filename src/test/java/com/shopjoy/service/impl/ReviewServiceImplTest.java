@@ -75,7 +75,7 @@ class ReviewServiceImplTest {
     @Test
     @DisplayName("Create Review - Success")
     void createReview_Success() {
-        when(reviewRepository.existsByUser_IdAndProduct_Id(1, 1)).thenReturn(false);
+        when(reviewRepository.existsByUserIdAndProductId(1, 1)).thenReturn(false);
         when(reviewMapper.toReview(any(CreateReviewRequest.class))).thenReturn(review);
         when(userRepository.getReferenceById(1)).thenReturn(user);
         when(productRepository.getReferenceById(1)).thenReturn(product);

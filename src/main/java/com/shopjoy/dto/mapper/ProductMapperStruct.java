@@ -40,6 +40,7 @@ public interface ProductMapperStruct {
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "categoryName", source = "category.categoryName")
     @Mapping(target = "stockQuantity", source = "inventory.quantityInStock")
+    @Mapping(target = "reorderLevel", source = "inventory.reorderLevel")
     @Mapping(target = "active", source = "active")
     ProductResponse toProductResponse(Product product);
 

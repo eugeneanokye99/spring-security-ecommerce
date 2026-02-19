@@ -45,33 +45,17 @@ export const updateReorderLevel = (productId, reorderLevel) =>
 export const getInventoryBatch = (productIds) => 
     api.get('/inventory/products/batch', { params: { productIds: productIds.join(',') } });
 
-// GET all inventory items (combines with product service)
+// GET all inventory items - now uses EntityGraph to fetch products with inventory in single query
 export const getAllInventoryItems = async () => {
     const products = await getAllProducts();
-    const productIds = products.data.map(p => p.product_id || p.productId || p.id);
-    
-    let inventoryMap = {};
-    try {
-        const inventoryResponse = await getInventoryBatch(productIds);
-        inventoryMap = (inventoryResponse.data || []).reduce((acc, inv) => {
-            acc[inv.productId] = inv;
-            return acc;
-        }, {});
-    } catch (error) {
-        console.error('Error fetching batch inventory:', error);
-    }
-
-    const inventoryItems = products.data.map(product => {
-        const productId = product.product_id || product.productId || product.id;
-        const inventory = inventoryMap[productId];
-        return {
-            ...product,
-            productId,
-            productName: product.product_name || product.productName || product.name,
-            stockQuantity: inventory?.stockQuantity || inventory?.quantityInStock || 0,
-            reorderLevel: inventory?.reorderLevel || 10,
-            reservedQuantity: inventory?.reservedQuantity || 0
-        };
-    });
+    // ProductResponse now includes stockQuantity and reorderLevel via EntityGraph
+    const inventoryItems = products.data.map(product => ({
+        ...product,
+        productId: product.id,
+        productName: product.productName,
+        stockQuantity: product.stockQuantity || 0,
+        reorderLevel: product.reorderLevel || 10,
+        reservedQuantity: 0
+    }));
     return { data: inventoryItems };
 };

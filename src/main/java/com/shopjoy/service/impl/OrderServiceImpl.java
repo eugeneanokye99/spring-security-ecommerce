@@ -25,6 +25,9 @@ import com.shopjoy.service.OrderService;
 import com.shopjoy.service.ProductService;
 import com.shopjoy.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -57,9 +60,14 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final OrderMapperStruct orderMapper;
 
-
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "orders", allEntries = true),
+        @CacheEvict(value = "ordersByUser", key = "#request.userId"),
+        @CacheEvict(value = "ordersByStatus", allEntries = true),
+        @CacheEvict(value = "pendingOrders", allEntries = true)
+    })
     public OrderResponse createOrder(CreateOrderRequest request) {
         validateCreateOrderRequest(request);
         
@@ -89,6 +97,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Cacheable(value = "order", key = "#orderId", unless = "#result == null")
     public OrderResponse getOrderById(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -97,8 +106,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Cacheable(value = "ordersByUser", key = "#userId")
     public List<OrderResponse> getOrdersByUser(Integer userId) {
-        List<Order> orders = orderRepository.findByUser_Id(userId);
+        List<Order> orders = orderRepository.findByUserId(userId);
         return orders.stream()
                 .map(orderMapper::toOrderResponse)
                 .collect(Collectors.toList());
@@ -106,7 +116,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderResponse> getOrdersByUserPaginated(Integer userId, Pageable pageable) {
-        Page<Order> orderPage = orderRepository.findByUser_Id(userId, pageable);
+        Page<Order> orderPage = orderRepository.findByUserId(userId, pageable);
 
         List<OrderResponse> content = orderPage.getContent().stream()
                 .map(orderMapper::toOrderResponse)
@@ -116,6 +126,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Cacheable(value = "ordersByStatus", key = "#status.name()")
     public List<OrderResponse> getOrdersByStatus(OrderStatus status) {
         if (status == null) {
             throw new ValidationException("Order status cannot be null");
@@ -172,6 +183,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Cacheable(value = "orders")
     public Page<OrderResponse> getAllOrdersPaginated(Pageable pageable) {
         Page<Order> orderPage = orderRepository.findAll(pageable);
         
@@ -191,6 +203,13 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "order", key = "#orderId"),
+        @CacheEvict(value = "orders", allEntries = true),
+        @CacheEvict(value = "ordersByUser", allEntries = true),
+        @CacheEvict(value = "ordersByStatus", allEntries = true),
+        @CacheEvict(value = "pendingOrders", allEntries = true)
+    })
     public OrderResponse updateOrderStatus(Integer orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -248,6 +267,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "order", key = "#orderId"),
+        @CacheEvict(value = "orders", allEntries = true),
+        @CacheEvict(value = "ordersByUser", allEntries = true),
+        @CacheEvict(value = "ordersByStatus", allEntries = true),
+        @CacheEvict(value = "pendingOrders", allEntries = true),
+        @CacheEvict(value = "inventory", allEntries = true)
+    })
     public OrderResponse cancelOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -259,7 +286,7 @@ public class OrderServiceImpl implements OrderService {
                     "cancel (can only cancel PENDING or PROCESSING orders)");
         }
 
-        List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(orderId);
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
 
         orderItems.forEach(item -> 
             inventoryService.releaseStock(item.getProduct().getId(), item.getQuantity())
@@ -274,11 +301,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Cacheable(value = "pendingOrders")
     public List<OrderResponse> getPendingOrders() {
         return getOrdersByStatus(OrderStatus.PENDING);
     }
 
     @Override
+    @Cacheable(value = "orders")
     public List<OrderResponse> getAllOrders() {
         return orderRepository.findAll().stream()
                 .map(orderMapper::toOrderResponse)
@@ -286,6 +315,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Caching(evict = {
+        @CacheEvict(value = "order", key = "#orderId"),
+        @CacheEvict(value = "orders", allEntries = true),
+        @CacheEvict(value = "ordersByUser", allEntries = true),
+        @CacheEvict(value = "ordersByStatus", allEntries = true),
+        @CacheEvict(value = "pendingOrders", allEntries = true)
+    })
     public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -307,6 +343,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "order", key = "#orderId"),
+        @CacheEvict(value = "orders", allEntries = true),
+        @CacheEvict(value = "ordersByUser", allEntries = true),
+        @CacheEvict(value = "ordersByStatus", allEntries = true),
+        @CacheEvict(value = "pendingOrders", allEntries = true),
+        @CacheEvict(value = "inventory", allEntries = true)
+    })
     public void deleteOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -315,7 +359,7 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidOrderStateException(orderId, order.getStatus().toString(), "delete (can only delete PENDING orders)");
         }
 
-        List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(orderId);
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
         orderItems.forEach(item -> 
             inventoryService.releaseStock(item.getProduct().getId(), item.getQuantity())
         );
@@ -536,7 +580,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void updateOrderItems(Order order, List<UpdateOrderItemRequest> newItems) {
-        List<OrderItem> existingItems = orderItemRepository.findByOrder_Id(order.getId());
+        List<OrderItem> existingItems = orderItemRepository.findByOrderId(order.getId());
         
         existingItems.forEach(item -> 
             inventoryService.releaseStock(item.getProduct().getId(), item.getQuantity())

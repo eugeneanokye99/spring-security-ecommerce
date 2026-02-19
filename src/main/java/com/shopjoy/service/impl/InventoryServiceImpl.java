@@ -12,6 +12,9 @@ import com.shopjoy.repository.ProductRepository;
 import com.shopjoy.service.InventoryService;
 import lombok.AllArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,13 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "inventory", allEntries = true),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
+        @CacheEvict(value = "lowStock", allEntries = true),
+        @CacheEvict(value = "outOfStock", allEntries = true),
+        @CacheEvict(value = "products", allEntries = true)
+    })
     public InventoryResponse createInventory(Integer productId, int initialStock, int reorderLevel) {
         Inventory inventory = new Inventory();
         inventory.setProduct(productRepository.getReferenceById(productId));
@@ -43,7 +53,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         validateInventoryData(inventory);
 
-        Optional<Inventory> existing = inventoryRepository.findByProduct_Id(productId);
+        Optional<Inventory> existing = inventoryRepository.findByProductId(productId);
         if (existing.isPresent()) {
             throw new DuplicateResourceException("Inventory", "productId", productId);
         }
@@ -57,34 +67,44 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Cacheable(value = "inventoryByProduct", key = "#productId", unless = "#result == null")
     public InventoryResponse getInventoryByProduct(Integer productId) {
-        Inventory inventory = inventoryRepository.findByProduct_Id(productId)
+        Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory", "productId", productId));
         return inventoryMapper.toInventoryResponse(inventory);
     }
 
     @Override
+    @Cacheable(value = "inventory", key = "'inStock-' + #productId")
     public boolean isProductInStock(Integer productId) {
-        return inventoryRepository.findByProduct_Id(productId)
+        return inventoryRepository.findByProductId(productId)
                 .map(inventory -> inventory.getQuantityInStock() > 0)
                 .orElse(false);
     }
 
     @Override
+    @Cacheable(value = "inventory", key = "'available-' + #productId + '-' + #quantity")
     public boolean hasAvailableStock(Integer productId, int quantity) {
-        return inventoryRepository.findByProduct_Id(productId)
+        return inventoryRepository.findByProductId(productId)
                 .map(inventory -> inventory.getQuantityInStock() >= quantity)
                 .orElse(false);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "inventory", allEntries = true),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
+        @CacheEvict(value = "lowStock", allEntries = true),
+        @CacheEvict(value = "outOfStock", allEntries = true),
+        @CacheEvict(value = "products", allEntries = true)
+    })
     public InventoryResponse updateStock(Integer productId, int newQuantity) {
         if (newQuantity < 0) {
             throw new ValidationException("quantityInStock", "cannot be negative");
         }
 
-        Inventory inventory = inventoryRepository.findByProduct_Id(productId)
+        Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory", "productId", productId));
 
         inventory.setQuantityInStock(newQuantity);
@@ -96,12 +116,19 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "inventory", allEntries = true),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
+        @CacheEvict(value = "lowStock", allEntries = true),
+        @CacheEvict(value = "outOfStock", allEntries = true),
+        @CacheEvict(value = "products", allEntries = true)
+    })
     public InventoryResponse addStock(Integer productId, int quantity) {
         if (quantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
         }
 
-        Inventory inventory = inventoryRepository.findByProduct_Id(productId)
+        Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory", "productId", productId));
 
         inventory.setQuantityInStock(inventory.getQuantityInStock() + quantity);
@@ -114,12 +141,19 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "inventory", allEntries = true),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
+        @CacheEvict(value = "lowStock", allEntries = true),
+        @CacheEvict(value = "outOfStock", allEntries = true),
+        @CacheEvict(value = "products", allEntries = true)
+    })
     public InventoryResponse removeStock(Integer productId, int quantity) {
         if (quantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
         }
 
-        Inventory inventory = inventoryRepository.findByProduct_Id(productId)
+        Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory", "productId", productId));
 
         if (inventory.getQuantityInStock() < quantity) {
@@ -145,12 +179,19 @@ public class InventoryServiceImpl implements InventoryService {
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "inventory", allEntries = true),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
+        @CacheEvict(value = "lowStock", allEntries = true),
+        @CacheEvict(value = "outOfStock", allEntries = true),
+        @CacheEvict(value = "products", allEntries = true)
+    })
     public void reserveStock(Integer productId, int quantity) {
         if (quantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
         }
 
-        Inventory inventory = inventoryRepository.findByProduct_Id(productId)
+        Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory", "productId", productId));
 
         if (inventory.getQuantityInStock() < quantity) {
@@ -167,12 +208,19 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "inventory", allEntries = true),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
+        @CacheEvict(value = "lowStock", allEntries = true),
+        @CacheEvict(value = "outOfStock", allEntries = true),
+        @CacheEvict(value = "products", allEntries = true)
+    })
     public void releaseStock(Integer productId, int quantity) {
         if (quantity <= 0) {
             throw new ValidationException("quantity", "must be positive");
         }
 
-        Inventory inventory = inventoryRepository.findByProduct_Id(productId)
+        Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory", "productId", productId));
                 
         inventory.setQuantityInStock(inventory.getQuantityInStock() + quantity);
@@ -181,6 +229,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Cacheable(value = "lowStock")
     public List<InventoryResponse> getLowStockProducts() {
         return inventoryRepository.findLowStock().stream()
                 .map(inventoryMapper::toInventoryResponse)
@@ -188,6 +237,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Cacheable(value = "outOfStock")
     public List<InventoryResponse> getOutOfStockProducts() {
         return inventoryRepository.findAll().stream()
                 .filter(inventory -> inventory.getQuantityInStock() == 0)
@@ -197,12 +247,18 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "inventory", allEntries = true),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
+        @CacheEvict(value = "lowStock", allEntries = true),
+        @CacheEvict(value = "products", allEntries = true)
+    })
     public InventoryResponse updateReorderLevel(Integer productId, int reorderLevel) {
         if (reorderLevel < 0) {
             throw new ValidationException("reorderLevel", "cannot be negative");
         }
 
-        Inventory inventory = inventoryRepository.findByProduct_Id(productId)
+        Inventory inventory = inventoryRepository.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory", "productId", productId));
         inventory.setReorderLevel(reorderLevel);
         inventory.setUpdatedAt(LocalDateTime.now());
@@ -217,7 +273,7 @@ public class InventoryServiceImpl implements InventoryService {
         if (productIds == null || productIds.isEmpty()) {
             return List.of();
         }
-        return inventoryRepository.findByProduct_IdIn(productIds).stream()
+        return inventoryRepository.findByProductIdIn(productIds).stream()
                 .map(inventoryMapper::toInventoryResponse)
                 .collect(Collectors.toList());
     }

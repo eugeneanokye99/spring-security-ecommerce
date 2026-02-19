@@ -15,8 +15,8 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer>, JpaSpecificationExecutor<Order> {
-    List<Order> findByUser_Id(int userId);
-    Page<Order> findByUser_Id(int userId, Pageable pageable);
+    List<Order> findByUserId(int userId);
+    Page<Order> findByUserId(int userId, Pageable pageable);
     
     List<Order> findByStatus(OrderStatus status);
     Page<Order> findByStatus(OrderStatus status, Pageable pageable);

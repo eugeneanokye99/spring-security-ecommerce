@@ -12,6 +12,9 @@ import com.shopjoy.service.AddressService;
 
 import lombok.AllArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,10 @@ public class AddressServiceImpl implements AddressService {
     
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "addresses", key = "#request.userId"),
+        @CacheEvict(value = "defaultAddress", key = "#request.userId")
+    })
     public AddressResponse createAddress(CreateAddressRequest request) {
         Address address = addressMapper.toAddress(request);
         address.setUser(userRepository.getReferenceById(request.getUserId()));
@@ -42,6 +49,7 @@ public class AddressServiceImpl implements AddressService {
     }
     
     @Override
+    @Cacheable(value = "addresses", key = "#addressId", cacheManager = "mediumCacheManager")
     public AddressResponse getAddressById(Integer addressId) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
@@ -49,9 +57,10 @@ public class AddressServiceImpl implements AddressService {
     }
     
     @Override
+    @Cacheable(value = "addresses", key = "'user_' + #userId", cacheManager = "mediumCacheManager")
     public List<AddressResponse> getAddressesByUser(Integer userId) {
 
-        List<Address> addresses = addressRepository.findByUser_Id(userId);
+        List<Address> addresses = addressRepository.findByUserId(userId);
         return addresses.stream()
                 .map(addressMapper::toAddressResponse)
                 .collect(Collectors.toList());
@@ -59,6 +68,10 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "addresses", allEntries = true),
+        @CacheEvict(value = "defaultAddress", allEntries = true)
+    })
     public AddressResponse updateAddress(Integer addressId, UpdateAddressRequest request) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
@@ -71,6 +84,10 @@ public class AddressServiceImpl implements AddressService {
     
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "addresses", allEntries = true),
+        @CacheEvict(value = "defaultAddress", allEntries = true)
+    })
     public void deleteAddress(Integer addressId) {
         if (!addressRepository.existsById(addressId)) {
             throw new ResourceNotFoundException("Address", "id", addressId);
@@ -81,11 +98,15 @@ public class AddressServiceImpl implements AddressService {
     
     @Override
     @Transactional()
+    @Caching(evict = {
+        @CacheEvict(value = "addresses", allEntries = true),
+        @CacheEvict(value = "defaultAddress", allEntries = true)
+    })
     public AddressResponse setDefaultAddress(Integer addressId) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
         
-        addressRepository.findByUser_IdAndIsDefaultTrue(address.getUser().getId())
+        addressRepository.findByUserIdAndIsDefaultTrue(address.getUser().getId())
                 .ifPresent(currentDefault -> {
                     currentDefault.setDefault(false);
                     addressRepository.save(currentDefault);
@@ -97,8 +118,9 @@ public class AddressServiceImpl implements AddressService {
     }
     
     @Override
+    @Cacheable(value = "defaultAddress", key = "#userId", cacheManager = "mediumCacheManager")
     public AddressResponse getDefaultAddress(Integer userId) {
-        Address address = addressRepository.findByUser_IdAndIsDefaultTrue(userId)
+        Address address = addressRepository.findByUserIdAndIsDefaultTrue(userId)
                 .orElse(null);
         return address != null ? addressMapper.toAddressResponse(address) : null;
     }
