@@ -26,6 +26,7 @@ import com.shopjoy.service.ProductService;
 import com.shopjoy.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
@@ -71,20 +72,21 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse createOrder(CreateOrderRequest request) {
         validateCreateOrderRequest(request);
         
-        Map<Integer, ProductResponse> productCache = fetchProducts(request.getOrderItems());
+        Map<Integer, ProductResponse> productsById = fetchProducts(request.getOrderItems());
         
-        BigDecimal totalAmount = validateStockAndCalculateTotal(request.getOrderItems(), productCache);
+        BigDecimal totalAmount = validateStockAndCalculateTotal(request.getOrderItems(), productsById);
         
         reserveInventory(request.getOrderItems());
         
         Order createdOrder = buildAndSaveOrder(request, totalAmount);
         
-        createAndSaveOrderItems(createdOrder, request.getOrderItems(), productCache);
+        createAndSaveOrderItems(createdOrder, request.getOrderItems(), productsById);
 
         return getOrderById(createdOrder.getId());
     }
 
     @Override
+    @Cacheable(value = "orders", cacheManager = "mediumCacheManager")
     public Page<OrderResponse> getOrders(Integer userId, OrderFilter filter, Pageable pageable) {
         Specification<Order> spec = OrderSpecification.withFilters(userId, filter);
         Page<Order> orderPage = orderRepository.findAll(spec, pageable);
@@ -97,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Cacheable(value = "order", key = "#orderId", unless = "#result == null")
+    @Cacheable(value = "order", key = "#orderId", unless = "#result == null", cacheManager = "mediumCacheManager")
     public OrderResponse getOrderById(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -106,7 +108,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Cacheable(value = "ordersByUser", key = "#userId")
+    @Cacheable(value = "ordersByUser", key = "#userId", cacheManager = "mediumCacheManager")
     public List<OrderResponse> getOrdersByUser(Integer userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
         return orders.stream()
@@ -316,12 +318,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Caching(evict = {
-        @CacheEvict(value = "order", key = "#orderId"),
-        @CacheEvict(value = "orders", allEntries = true),
-        @CacheEvict(value = "ordersByUser", allEntries = true),
-        @CacheEvict(value = "ordersByStatus", allEntries = true),
-        @CacheEvict(value = "pendingOrders", allEntries = true)
-    })
+                @CacheEvict(value = "orders", allEntries = true),
+                @CacheEvict(value = "ordersByUser", allEntries = true),
+                @CacheEvict(value = "ordersByStatus", allEntries = true),
+                @CacheEvict(value = "pendingOrders", allEntries = true)
+            },
+            put = {
+                @CachePut(value = "order", key = "#orderId", cacheManager = "mediumCacheManager")
+            }
+    )
     public OrderResponse updateOrder(Integer orderId, UpdateOrderRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
@@ -498,10 +503,10 @@ public class OrderServiceImpl implements OrderService {
         return productMap;
     }
 
-    private BigDecimal validateStockAndCalculateTotal(List<CreateOrderItemRequest> items, Map<Integer, ProductResponse> productCache) {
+    private BigDecimal validateStockAndCalculateTotal(List<CreateOrderItemRequest> items, Map<Integer, ProductResponse> productsById) {
         return items.stream()
                 .map(itemReq -> {
-                    ProductResponse product = productCache.get(itemReq.getProductId());
+                    ProductResponse product = productsById.get(itemReq.getProductId());
                     if (!product.isActive()) {
                         throw new ValidationException("Product " + product.getProductName() + " is not active");
                     }
@@ -538,10 +543,10 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
-    private void createAndSaveOrderItems(Order order, List<CreateOrderItemRequest> items, Map<Integer, ProductResponse> productCache) {
+    private void createAndSaveOrderItems(Order order, List<CreateOrderItemRequest> items, Map<Integer, ProductResponse> productsById) {
         List<OrderItem> orderItems = items.stream()
                 .map(itemReq -> {
-                    ProductResponse product = productCache.get(itemReq.getProductId());
+                    ProductResponse product = productsById.get(itemReq.getProductId());
                     BigDecimal unitPrice = BigDecimal.valueOf(product.getPrice());
                     BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity()));
 

@@ -82,7 +82,7 @@ class CartServiceImplTest {
         ProductResponse pr = new ProductResponse();
         pr.setId(1);
         when(productService.getProductById(1)).thenReturn(pr);
-        when(cartItemRepository.findByUser_IdAndProduct_Id(1, 1)).thenReturn(Optional.empty());
+        when(cartItemRepository.findByUserIdAndProductId(1, 1)).thenReturn(Optional.empty());
         when(inventoryService.hasAvailableStock(1, 2)).thenReturn(true);
         when(userRepository.getReferenceById(1)).thenReturn(user);
         when(productRepository.getReferenceById(1)).thenReturn(product);
@@ -101,7 +101,7 @@ class CartServiceImplTest {
         ProductResponse pr = new ProductResponse();
         pr.setId(1);
         when(productService.getProductById(1)).thenReturn(pr);
-        when(cartItemRepository.findByUser_IdAndProduct_Id(1, 1)).thenReturn(Optional.of(cartItem));
+        when(cartItemRepository.findByUserIdAndProductId(1, 1)).thenReturn(Optional.of(cartItem));
         when(inventoryService.hasAvailableStock(1, 2)).thenReturn(true);
         when(inventoryService.hasAvailableStock(1, 4)).thenReturn(true);
         when(cartItemRepository.save(any(CartItem.class))).thenReturn(cartItem);
