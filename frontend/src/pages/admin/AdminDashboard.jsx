@@ -14,6 +14,7 @@ import {
     FolderTree,
     MessageSquare,
     Zap,
+    Shield,
 } from 'lucide-react';
 import ProductManagement from '../../components/admin/ProductManagement';
 import OrderManagement from '../../components/admin/OrderManagement';
@@ -23,6 +24,7 @@ import InventoryManagement from '../../components/admin/InventoryManagement';
 import ReviewManagement from '../../components/admin/ReviewManagement';
 import Dashboard from '../../components/admin/Dashboard';
 import OptimizationMetrics from '../../components/admin/OptimizationMetrics';
+import SecurityAuditLogManagement from '../../components/admin/SecurityAuditLogManagement';
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
@@ -50,6 +52,7 @@ const AdminDashboard = () => {
         { id: 'users', label: 'Users', icon: Users },
         { id: 'inventory', label: 'Inventory', icon: AlertTriangle },
         { id: 'reviews', label: 'Reviews', icon: MessageSquare },
+        { id: 'audit-logs', label: 'Security Logs', icon: Shield },
         { id: 'performance', label: 'Optimization', icon: Zap },
     ];
 
@@ -69,6 +72,8 @@ const AdminDashboard = () => {
                 return <InventoryManagement />;
             case 'reviews':
                 return <ReviewManagement />;
+            case 'audit-logs':
+                return <SecurityAuditLogManagement />;
             case 'performance':
                 return <OptimizationMetrics />;
             default:

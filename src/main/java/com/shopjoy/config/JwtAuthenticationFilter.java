@@ -1,7 +1,11 @@
 package com.shopjoy.config;
 
+import com.shopjoy.entity.SecurityEventType;
 import com.shopjoy.service.CustomUserDetailsService;
+import com.shopjoy.service.SecurityAuditService;
 import com.shopjoy.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
+    private final SecurityAuditService securityAuditService;
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -39,41 +44,82 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        
+
         try {
             String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-            
+
             if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
                 filterChain.doFilter(request, response);
                 return;
             }
-            
+
             String jwtToken = authHeader.substring(BEARER_PREFIX.length());
-            
-            String username = jwtUtil.extractUsername(jwtToken);
-            
+            String username = null;
+
+            try {
+                username = jwtUtil.extractUsername(jwtToken);
+            } catch (ExpiredJwtException e) {
+                log.warn("JWT token expired for request: {}", request.getRequestURI());
+                securityAuditService.logEvent(
+                    e.getClaims().getSubject(),
+                    SecurityEventType.TOKEN_EXPIRED,
+                    request,
+                    "JWT token expired: " + request.getRequestURI(),
+                    false
+                );
+                filterChain.doFilter(request, response);
+                return;
+            } catch (JwtException e) {
+                log.warn("Invalid JWT token: {}", e.getMessage());
+                securityAuditService.logEvent(
+                    null,
+                    SecurityEventType.TOKEN_INVALID,
+                    request,
+                    "Invalid JWT token: " + e.getMessage(),
+                    false
+                );
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                
+
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                
+
                 if (isTokenValid(jwtToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = 
+                    UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails,
                                     null,
                                     userDetails.getAuthorities()
                             );
-                    
+
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    
+
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    
+
                     log.debug("JWT authentication successful for user: {}", username);
+                } else {
+                    log.warn("Invalid JWT token for user: {}", username);
+                    securityAuditService.logEvent(
+                        username,
+                        SecurityEventType.TOKEN_INVALID,
+                        request,
+                        "Token validation failed",
+                        false
+                    );
                 }
             }
-            
+
         } catch (Exception e) {
             log.error("JWT authentication failed: {}", e.getMessage());
+            securityAuditService.logEvent(
+                null,
+                SecurityEventType.TOKEN_INVALID,
+                request,
+                "JWT authentication error: " + e.getMessage(),
+                false
+            );
         }
         
         filterChain.doFilter(request, response);
