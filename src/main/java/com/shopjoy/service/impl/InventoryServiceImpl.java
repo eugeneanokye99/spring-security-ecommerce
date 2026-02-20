@@ -40,11 +40,11 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Caching(evict = {
-        @CacheEvict(value = "inventory", allEntries = true),
-        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
-        @CacheEvict(value = "lowStock", allEntries = true),
-        @CacheEvict(value = "outOfStock", allEntries = true),
-        @CacheEvict(value = "products", allEntries = true)
+        @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId", cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "lowStock", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "outOfStock", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "products", allEntries = true, cacheManager = "cacheManager")
     })
     public InventoryResponse createInventory(Integer productId, int initialStock, int reorderLevel) {
         Inventory inventory = new Inventory();
@@ -96,10 +96,10 @@ public class InventoryServiceImpl implements InventoryService {
     @Caching(
         put = { @CachePut(value = "inventoryByProduct", key = "#productId", cacheManager = "shortCacheManager") },
         evict = {
-            @CacheEvict(value = "inventory", allEntries = true),
-            @CacheEvict(value = "lowStock", allEntries = true),
-            @CacheEvict(value = "outOfStock", allEntries = true),
-            @CacheEvict(value = "products", allEntries = true)
+            @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "lowStock", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "outOfStock", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "products", allEntries = true, cacheManager = "cacheManager")
         }
     )
     public InventoryResponse updateStock(Integer productId, int newQuantity) {
@@ -122,10 +122,10 @@ public class InventoryServiceImpl implements InventoryService {
     @Caching(
         put = { @CachePut(value = "inventoryByProduct", key = "#productId", cacheManager = "shortCacheManager") },
         evict = {
-            @CacheEvict(value = "inventory", allEntries = true),
-            @CacheEvict(value = "lowStock", allEntries = true),
-            @CacheEvict(value = "outOfStock", allEntries = true),
-            @CacheEvict(value = "products", allEntries = true)
+            @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "lowStock", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "outOfStock", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "products", allEntries = true, cacheManager = "cacheManager")
         }
     )
     public InventoryResponse addStock(Integer productId, int quantity) {
@@ -149,10 +149,10 @@ public class InventoryServiceImpl implements InventoryService {
     @Caching(
         put = { @CachePut(value = "inventoryByProduct", key = "#productId", cacheManager = "shortCacheManager") },
         evict = {
-            @CacheEvict(value = "inventory", allEntries = true),
-            @CacheEvict(value = "lowStock", allEntries = true),
-            @CacheEvict(value = "outOfStock", allEntries = true),
-            @CacheEvict(value = "products", allEntries = true)
+            @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "lowStock", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "outOfStock", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "products", allEntries = true, cacheManager = "cacheManager")
         }
     )
     public InventoryResponse removeStock(Integer productId, int quantity) {
@@ -187,11 +187,11 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Caching(evict = {
-        @CacheEvict(value = "inventory", allEntries = true),
-        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
-        @CacheEvict(value = "lowStock", allEntries = true),
-        @CacheEvict(value = "outOfStock", allEntries = true),
-        @CacheEvict(value = "products", allEntries = true)
+        @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId", cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "lowStock", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "outOfStock", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "products", allEntries = true, cacheManager = "cacheManager")
     })
     public void reserveStock(Integer productId, int quantity) {
         if (quantity <= 0) {
@@ -216,11 +216,11 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Caching(evict = {
-        @CacheEvict(value = "inventory", allEntries = true),
-        @CacheEvict(value = "inventoryByProduct", key = "#productId"),
-        @CacheEvict(value = "lowStock", allEntries = true),
-        @CacheEvict(value = "outOfStock", allEntries = true),
-        @CacheEvict(value = "products", allEntries = true)
+        @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "inventoryByProduct", key = "#productId", cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "lowStock", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "outOfStock", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "products", allEntries = true, cacheManager = "cacheManager")
     })
     public void releaseStock(Integer productId, int quantity) {
         if (quantity <= 0) {
@@ -257,9 +257,9 @@ public class InventoryServiceImpl implements InventoryService {
     @Caching(
         put = { @CachePut(value = "inventoryByProduct", key = "#productId", cacheManager = "shortCacheManager") },
         evict = {
-            @CacheEvict(value = "inventory", allEntries = true),
-            @CacheEvict(value = "lowStock", allEntries = true),
-            @CacheEvict(value = "products", allEntries = true)
+            @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "lowStock", allEntries = true, cacheManager = "shortCacheManager"),
+            @CacheEvict(value = "products", allEntries = true, cacheManager = "cacheManager")
         }
     )
     public InventoryResponse updateReorderLevel(Integer productId, int reorderLevel) {

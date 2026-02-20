@@ -47,9 +47,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "cartItems", key = "#request.userId"),
-        @CacheEvict(value = "cartTotal", key = "#request.userId"),
-        @CacheEvict(value = "cartCount", key = "#request.userId")
+        @CacheEvict(value = "cartItems", key = "#request.userId", cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "cartTotal", key = "#request.userId", cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "cartCount", key = "#request.userId", cacheManager = "shortCacheManager")
     })
     public CartItemResponse addToCart(AddToCartRequest request) {
         if (request.getQuantity() <= 0) {
@@ -91,9 +91,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "cartItems", allEntries = true),
-        @CacheEvict(value = "cartTotal", allEntries = true),
-        @CacheEvict(value = "cartCount", allEntries = true)
+        @CacheEvict(value = "cartItems", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "cartTotal", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "cartCount", allEntries = true, cacheManager = "shortCacheManager")
     })
     public CartItemResponse updateCartItemQuantity(Integer cartItemId, int newQuantity) {
         if (newQuantity <= 0) {
@@ -124,9 +124,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "cartItems", allEntries = true),
-        @CacheEvict(value = "cartTotal", allEntries = true),
-        @CacheEvict(value = "cartCount", allEntries = true)
+        @CacheEvict(value = "cartItems", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "cartTotal", allEntries = true, cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "cartCount", allEntries = true, cacheManager = "shortCacheManager")
     })
     public void removeFromCart(Integer cartItemId) {
         Integer cartItemOwnerId = cartItemRepository.findUserIdByCartItemId(cartItemId);
@@ -153,9 +153,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "cartItems", key = "#userId"),
-        @CacheEvict(value = "cartTotal", key = "#userId"),
-        @CacheEvict(value = "cartCount", key = "#userId")
+        @CacheEvict(value = "cartItems", key = "#userId", cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "cartTotal", key = "#userId", cacheManager = "shortCacheManager"),
+        @CacheEvict(value = "cartCount", key = "#userId", cacheManager = "shortCacheManager")
     })
     public void clearCart(Integer userId) {
         cartItemRepository.deleteByUserId(userId);

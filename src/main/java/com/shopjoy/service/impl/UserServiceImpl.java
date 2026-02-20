@@ -99,8 +99,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional()
     @Caching(
-        put = { @CachePut(value = "userProfile", key = "#userId") },
-        evict = { @CacheEvict(value = {"userProfileEmail", "userProfileUsername", "usersByIds"}, allEntries = true) }
+        put = { @CachePut(value = "userProfile", key = "#userId", cacheManager = "cacheManager") },
+        evict = { @CacheEvict(value = {"userProfileEmail", "userProfileUsername", "usersByIds"}, allEntries = true, cacheManager = "cacheManager") }
     )
     public UserResponse updateUserProfile(Integer userId, UpdateUserRequest request) {
         if (!SecurityUtil.canAccessUser(userId)) {
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = {"userProfile", "userProfileEmail", "userProfileUsername", "usersByIds"}, allEntries = true)
+        @CacheEvict(value = {"userProfile", "userProfileEmail", "userProfileUsername", "usersByIds"}, allEntries = true, cacheManager = "cacheManager")
     })
     public void deleteUser(Integer userId) {
         if (!userRepository.existsById(userId)) {

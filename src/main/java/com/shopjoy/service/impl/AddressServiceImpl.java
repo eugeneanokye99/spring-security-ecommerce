@@ -40,8 +40,8 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "addresses", key = "#request.userId"),
-        @CacheEvict(value = "defaultAddress", key = "#request.userId")
+        @CacheEvict(value = "addresses", key = "#request.userId", cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "defaultAddress", key = "#request.userId", cacheManager = "mediumCacheManager")
     })
     public AddressResponse createAddress(CreateAddressRequest request) {
         Address address = addressMapper.toAddress(request);
@@ -83,8 +83,8 @@ public class AddressServiceImpl implements AddressService {
     @Caching(
         put = { @CachePut(value = "addresses", key = "#addressId", cacheManager = "mediumCacheManager") },
         evict = {
-            @CacheEvict(value = "addresses", allEntries = true),
-            @CacheEvict(value = "defaultAddress", allEntries = true)
+            @CacheEvict(value = "addresses", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "defaultAddress", allEntries = true, cacheManager = "mediumCacheManager")
         }
     )
     public AddressResponse updateAddress(Integer addressId, UpdateAddressRequest request) {
@@ -109,8 +109,8 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "addresses", allEntries = true),
-        @CacheEvict(value = "defaultAddress", allEntries = true)
+        @CacheEvict(value = "addresses", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "defaultAddress", allEntries = true, cacheManager = "mediumCacheManager")
     })
     public void deleteAddress(Integer addressId) {
         Integer addressOwnerId = addressRepository.findUserIdByAddressId(addressId);
@@ -130,8 +130,8 @@ public class AddressServiceImpl implements AddressService {
     @Caching(
         put = { @CachePut(value = "addresses", key = "#addressId", cacheManager = "mediumCacheManager") },
         evict = {
-            @CacheEvict(value = "addresses", allEntries = true),
-            @CacheEvict(value = "defaultAddress", allEntries = true)
+            @CacheEvict(value = "addresses", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "defaultAddress", allEntries = true, cacheManager = "mediumCacheManager")
         }
     )
     public AddressResponse setDefaultAddress(Integer addressId) {

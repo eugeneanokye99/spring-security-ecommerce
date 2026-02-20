@@ -1,0 +1,2 @@
+2026-02-19 15:14:26.565 - [2026-02-19 15:14:26.565] AUDIT START: Action=USER_REGISTRATION, Description=Registering new user, Method=AuthServiceImpl.registerUser(CreateUserRequest, UserType), Arguments=[com.shopjoy.dto.request.CreateUserRequest@5755f647, CUSTOMER]
+2026-02-19 15:14:26.895 - [2026-02-19 15:14:26.894] AUDIT SUCCESS: Action=USER_REGISTRATION, Method=AuthServiceImpl.registerUser(CreateUserRequest, UserType)

@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     @Transactional()
-    @CacheEvict(value = "categories", allEntries = true)
+    @CacheEvict(value = "categories", allEntries = true, cacheManager = "cacheManager")
     public CategoryResponse createCategory(CreateCategoryRequest request) {
         Category category = categoryMapper.toCategory(request);
         
@@ -88,8 +88,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional()
     @Caching(
-        put = { @CachePut(value = "category", key = "#categoryId") },
-        evict = { @CacheEvict(value = "categories", allEntries = true) }
+        put = { @CachePut(value = "category", key = "#categoryId", cacheManager = "cacheManager") },
+        evict = { @CacheEvict(value = "categories", allEntries = true, cacheManager = "cacheManager") }
     )
     public CategoryResponse updateCategory(Integer categoryId, UpdateCategoryRequest request) {
         Category category = categoryRepository.findById(categoryId)
@@ -106,8 +106,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "category", key = "#categoryId"),
-        @CacheEvict(value = "categories", allEntries = true)
+        @CacheEvict(value = "category", key = "#categoryId", cacheManager = "cacheManager"),
+        @CacheEvict(value = "categories", allEntries = true, cacheManager = "cacheManager")
     })
     public void deleteCategory(Integer categoryId) {
         if (!categoryRepository.existsById(categoryId)) {

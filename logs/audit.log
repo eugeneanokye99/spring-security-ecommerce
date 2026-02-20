@@ -1,2 +1,2 @@
-2026-02-19 15:14:26.565 - [2026-02-19 15:14:26.565] AUDIT START: Action=USER_REGISTRATION, Description=Registering new user, Method=AuthServiceImpl.registerUser(CreateUserRequest, UserType), Arguments=[com.shopjoy.dto.request.CreateUserRequest@5755f647, CUSTOMER]
-2026-02-19 15:14:26.895 - [2026-02-19 15:14:26.894] AUDIT SUCCESS: Action=USER_REGISTRATION, Method=AuthServiceImpl.registerUser(CreateUserRequest, UserType)
+2026-02-20 14:20:05.952 - [2026-02-20 14:20:05.952] AUDIT: STOCK RESERVED - Method: reserveStock, Arguments: [42, 2]
+2026-02-20 14:20:06.128 - [2026-02-20 14:20:06.128] AUDIT: ORDER CREATED - Method: createOrder, Arguments: [com.shopjoy.dto.request.CreateOrderRequest@977450a]

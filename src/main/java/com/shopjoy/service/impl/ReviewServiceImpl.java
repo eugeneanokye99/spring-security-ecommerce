@@ -47,10 +47,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "reviews", allEntries = true),
-        @CacheEvict(value = "reviewsByProduct", key = "#request.productId"),
-        @CacheEvict(value = "reviewsByUser", key = "#request.userId"),
-        @CacheEvict(value = "productRating", key = "#request.productId")
+        @CacheEvict(value = "reviews", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "reviewsByProduct", key = "#request.productId", cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "reviewsByUser", key = "#request.userId", cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "productRating", key = "#request.productId", cacheManager = "mediumCacheManager")
     })
     public ReviewResponse createReview(CreateReviewRequest request) {
         if (reviewRepository.hasReviewed(request.getUserId(), request.getProductId())) {
@@ -107,10 +107,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Caching(
         put = { @CachePut(value = "review", key = "#reviewId", cacheManager = "mediumCacheManager") },
         evict = {
-            @CacheEvict(value = "reviews", allEntries = true),
-            @CacheEvict(value = "reviewsByProduct", allEntries = true),
-            @CacheEvict(value = "reviewsByUser", allEntries = true),
-            @CacheEvict(value = "productRating", allEntries = true)
+            @CacheEvict(value = "reviews", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "reviewsByProduct", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "reviewsByUser", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "productRating", allEntries = true, cacheManager = "mediumCacheManager")
         }
     )
     public ReviewResponse updateReview(Integer reviewId, UpdateReviewRequest request) {
@@ -136,11 +136,11 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "review", key = "#reviewId"),
-        @CacheEvict(value = "reviews", allEntries = true),
-        @CacheEvict(value = "reviewsByProduct", allEntries = true),
-        @CacheEvict(value = "reviewsByUser", allEntries = true),
-        @CacheEvict(value = "productRating", allEntries = true)
+        @CacheEvict(value = "review", key = "#reviewId", cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "reviews", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "reviewsByProduct", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "reviewsByUser", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "productRating", allEntries = true, cacheManager = "mediumCacheManager")
     })
     public void deleteReview(Integer reviewId) {
         Integer reviewOwnerId = reviewRepository.findUserIdByReviewId(reviewId);

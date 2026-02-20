@@ -47,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true)
+    @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true, cacheManager = "cacheManager")
     public ProductResponse createProduct(CreateProductRequest request) {
         Product product = productMapper.toProduct(request);
         if (request.getCategoryId() != null) {
@@ -161,8 +161,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     @Caching(
-        put = { @CachePut(value = "product", key = "#productId") },
-        evict = { @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true) }
+        put = { @CachePut(value = "product", key = "#productId", cacheManager = "cacheManager") },
+        evict = { @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true, cacheManager = "cacheManager") }
     )
     public ProductResponse updateProduct(Integer productId, UpdateProductRequest request) {
         Product existingProduct = productRepository.findById(productId)
@@ -185,8 +185,8 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Auditable(action = "UPDATE_PRICE", description = "Updating product price")
     @Caching(
-        put = { @CachePut(value = "product", key = "#productId") },
-        evict = { @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true) }
+        put = { @CachePut(value = "product", key = "#productId", cacheManager = "cacheManager") },
+        evict = { @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true, cacheManager = "cacheManager") }
     )
     public ProductResponse updateProductPrice(Integer productId, double newPrice) {
         if (newPrice < 0) {
@@ -206,8 +206,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     @Caching(
-        put = { @CachePut(value = "product", key = "#productId") },
-        evict = { @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true) }
+        put = { @CachePut(value = "product", key = "#productId", cacheManager = "cacheManager") },
+        evict = { @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true, cacheManager = "cacheManager") }
     )
     public ProductResponse activateProduct(Integer productId) {
         Product product = productRepository.findById(productId)
@@ -221,8 +221,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     @Caching(
-        put = { @CachePut(value = "product", key = "#productId") },
-        evict = { @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true) }
+        put = { @CachePut(value = "product", key = "#productId", cacheManager = "cacheManager") },
+        evict = { @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true, cacheManager = "cacheManager") }
     )
     public ProductResponse deactivateProduct(Integer productId) {
         Product product = productRepository.findById(productId)
@@ -236,8 +236,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "product", key = "#productId"),
-        @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true)
+        @CacheEvict(value = "product", key = "#productId", cacheManager = "cacheManager"),
+        @CacheEvict(value = {"products", "activeProducts", "productsByCategory"}, allEntries = true, cacheManager = "cacheManager")
     })
     public void deleteProduct(Integer productId) {
         if (!productRepository.existsById(productId)) {

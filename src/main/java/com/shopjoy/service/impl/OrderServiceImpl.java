@@ -66,10 +66,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Caching(evict = {
-        @CacheEvict(value = "orders", allEntries = true),
-        @CacheEvict(value = "ordersByUser", key = "#request.userId"),
-        @CacheEvict(value = "ordersByStatus", allEntries = true),
-        @CacheEvict(value = "pendingOrders", allEntries = true)
+        @CacheEvict(value = "orders", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "ordersByUser", key = "#request.userId", cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "ordersByStatus", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "pendingOrders", allEntries = true, cacheManager = "mediumCacheManager")
     })
     public OrderResponse createOrder(CreateOrderRequest request) {
         validateCreateOrderRequest(request);
@@ -220,10 +220,10 @@ public class OrderServiceImpl implements OrderService {
     @Caching(
         put = { @CachePut(value = "order", key = "#orderId", cacheManager = "mediumCacheManager") },
         evict = {
-            @CacheEvict(value = "orders", allEntries = true),
-            @CacheEvict(value = "ordersByUser", allEntries = true),
-            @CacheEvict(value = "ordersByStatus", allEntries = true),
-            @CacheEvict(value = "pendingOrders", allEntries = true)
+            @CacheEvict(value = "orders", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "ordersByUser", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "ordersByStatus", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "pendingOrders", allEntries = true, cacheManager = "mediumCacheManager")
         }
     )
     public OrderResponse updateOrderStatus(Integer orderId, OrderStatus newStatus) {
@@ -302,11 +302,11 @@ public class OrderServiceImpl implements OrderService {
     @Caching(
         put = { @CachePut(value = "order", key = "#orderId", cacheManager = "mediumCacheManager") },
         evict = {
-            @CacheEvict(value = "orders", allEntries = true),
-            @CacheEvict(value = "ordersByUser", allEntries = true),
-            @CacheEvict(value = "ordersByStatus", allEntries = true),
-            @CacheEvict(value = "pendingOrders", allEntries = true),
-            @CacheEvict(value = "inventory", allEntries = true)
+            @CacheEvict(value = "orders", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "ordersByUser", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "ordersByStatus", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "pendingOrders", allEntries = true, cacheManager = "mediumCacheManager"),
+            @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager")
         }
     )
     public OrderResponse cancelOrder(Integer orderId) {
@@ -359,10 +359,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Caching(evict = {
-                @CacheEvict(value = "orders", allEntries = true),
-                @CacheEvict(value = "ordersByUser", allEntries = true),
-                @CacheEvict(value = "ordersByStatus", allEntries = true),
-                @CacheEvict(value = "pendingOrders", allEntries = true)
+                @CacheEvict(value = "orders", allEntries = true, cacheManager = "mediumCacheManager"),
+                @CacheEvict(value = "ordersByUser", allEntries = true, cacheManager = "mediumCacheManager"),
+                @CacheEvict(value = "ordersByStatus", allEntries = true, cacheManager = "mediumCacheManager"),
+                @CacheEvict(value = "pendingOrders", allEntries = true, cacheManager = "mediumCacheManager")
             },
             put = {
                 @CachePut(value = "order", key = "#orderId", cacheManager = "mediumCacheManager")
@@ -390,12 +390,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "order", key = "#orderId"),
-        @CacheEvict(value = "orders", allEntries = true),
-        @CacheEvict(value = "ordersByUser", allEntries = true),
-        @CacheEvict(value = "ordersByStatus", allEntries = true),
-        @CacheEvict(value = "pendingOrders", allEntries = true),
-        @CacheEvict(value = "inventory", allEntries = true)
+        @CacheEvict(value = "order", key = "#orderId", cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "orders", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "ordersByUser", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "ordersByStatus", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "pendingOrders", allEntries = true, cacheManager = "mediumCacheManager"),
+        @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager")
     })
     public void deleteOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
