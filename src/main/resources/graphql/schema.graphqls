@@ -146,5 +146,6 @@ type Query {
 type Mutation {
     updateOrder(id: ID!, input: UpdateOrderInput!): Order
     deleteOrder(id: ID!): Boolean
+    cancelOrder(id: ID!): Order
     updateOrderStatus(id: ID!, status: String!): Order
 }

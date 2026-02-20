@@ -430,6 +430,15 @@ public class OrderServiceImpl implements OrderService {
         @CacheEvict(value = "inventory", allEntries = true, cacheManager = "shortCacheManager")
     })
     public void deleteOrder(Integer orderId) {
+        Integer orderOwnerId = orderRepository.findUserIdByOrderId(orderId);
+        if (orderOwnerId == null) {
+            throw new ResourceNotFoundException("Order", "id", orderId);
+        }
+        
+        if (!SecurityUtil.isAdmin() && !SecurityUtil.isCurrentUser(orderOwnerId)) {
+            throw new AccessDeniedException("You do not have permission to delete this order");
+        }
+        
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 

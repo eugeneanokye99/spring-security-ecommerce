@@ -10,3 +10,7 @@
 2026-02-20 16:00:52.355 - [2026-02-20 16:00:52.355] AUDIT: ORDER UPDATED - Method: updateOrderStatus, Arguments: [30, SHIPPED]
 2026-02-20 16:00:54.016 - [2026-02-20 16:00:54.016] AUDIT: ORDER UPDATED - Method: updateOrderStatus, Arguments: [30, DELIVERED]
 2026-02-20 16:00:58.301 - [2026-02-20 16:00:58.301] AUDIT: ORDER UPDATED - Method: updateOrderStatus, Arguments: [28, DELIVERED]
+2026-02-20 16:52:59.232 - [2026-02-20 16:52:59.231] AUDIT: STOCK RESERVED - Method: reserveStock, Arguments: [46, 2]
+2026-02-20 16:52:59.278 - [2026-02-20 16:52:59.278] AUDIT: ORDER CREATED - Method: createOrder, Arguments: [com.shopjoy.dto.request.CreateOrderRequest@720f6fcc]
+2026-02-20 16:53:06.499 - [2026-02-20 16:53:06.499] AUDIT: STOCK RESERVED - Method: reserveStock, Arguments: [46, 2]
+2026-02-20 16:53:06.505 - [2026-02-20 16:53:06.505] AUDIT: ORDER UPDATED - Method: updateOrder, Arguments: [31, com.shopjoy.dto.request.UpdateOrderRequest@2b4dd5c0]

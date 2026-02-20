@@ -27,10 +27,16 @@ public class OrderMutationResolver {
     }
 
     @MutationMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public Boolean deleteOrder(@Argument Long id) {
         orderService.deleteOrder(id.intValue());
         return true;
+    }
+
+    @MutationMapping
+    @PreAuthorize("isAuthenticated()")
+    public OrderResponse cancelOrder(@Argument Long id) {
+        return orderService.cancelOrder(id.intValue());
     }
 
     @MutationMapping
