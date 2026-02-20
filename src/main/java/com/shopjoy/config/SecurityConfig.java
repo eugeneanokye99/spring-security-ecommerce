@@ -101,10 +101,43 @@ public class SecurityConfig {
     }
 
     /**
+     * Security filter chain for OAuth2 social login endpoints.
+     * 
+     * This filter chain is dedicated to OAuth2 authentication (Google login).
+     * It is evaluated second (@Order(2)) and only applies to OAuth2-specific paths.
+     * 
+     * ISOLATED FROM API ENDPOINTS:
+     * - Only handles /oauth2/** and /login/oauth2/** paths
+     * - Doesn't interfere with JWT-based API testing
+     * - Enables social login without affecting Postman testing
+     * - Uses session-based authentication for OAuth2 flow
+     *
+     * @param http HttpSecurity configuration
+     * @return configured SecurityFilterChain for OAuth2
+     */
+    @Bean
+    @Order(2)
+    public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher("/oauth2/**", "/login/oauth2/**")
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oAuth2LoginSuccessHandler)
+                .failureUrl("/login?error=oauth2_failed")
+            );
+        
+        return http.build();
+    }
+
+    /**
      * Security filter chain for JWT-based API endpoints WITHOUT CSRF protection.
      * 
-     * This filter chain applies to all other endpoints and uses JWT authentication.
-     * It is evaluated second (@Order(2)) after the form filter chain.
+     * This filter chain applies to API and GraphQL endpoints using JWT authentication.
+     * It is evaluated third (@Order(3)) after form and OAuth2 filter chains.
      * 
      * CSRF PROTECTION DISABLED because:
      * - JWT tokens are stored in localStorage/sessionStorage, NOT cookies
@@ -112,22 +145,20 @@ public class SecurityConfig {
      * - Attacker cannot force victim's browser to send JWT token
      * - JWT APIs are inherently immune to CSRF attacks
      * - CSRF relies on automatic credential submission (cookies), which doesn't apply to JWTs
+     * 
      *
      * @param http HttpSecurity configuration
      * @return configured SecurityFilterChain with CSRF disabled
      */
     @Bean
-    @Order(2)
+    @Order(3)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .authorizeHttpRequests(auth -> auth
                 // Authentication endpoints
-                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
-                
-                // OAuth2 endpoints
-                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/logout").permitAll()
                 
                 // GraphQL endpoints - require authentication
                 .requestMatchers("/graphql", "/graphiql").authenticated()
@@ -169,10 +200,6 @@ public class SecurityConfig {
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .oauth2Login(oauth2 -> oauth2
-                .successHandler(oAuth2LoginSuccessHandler)
-                .failureUrl("/login?error=oauth2_failed")
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         

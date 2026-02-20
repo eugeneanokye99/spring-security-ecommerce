@@ -7584,3 +7584,442 @@ java.lang.IllegalStateException: The request object has been recycled and is no 
 2026-02-20 14:51:05.356 [http-nio-8080-exec-9] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@2073430127 wrapping org.postgresql.jdbc.PgConnection@2d2697a8]
 2026-02-20 14:51:05.356 [http-nio-8080-exec-9] INFO  c.shopjoy.aspect.PerformanceAspect - API endpoint ProductController.getProductsWithFilters responded in 38ms
 2026-02-20 14:51:05.356 [http-nio-8080-exec-9] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT COMPLETED: ProductController.getProductsWithFilters returned: ResponseEntity
+2026-02-20 15:18:10.057 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-20 15:18:10.336 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-20 15:18:10.359 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-20 15:18:10.364 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-02-20 15:18:10.383 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-02-20 15:19:54.604 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Starting ShopjoyEcommerceSystemApplication using Java 25.0.1 with PID 12864 (C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce\target\classes started by EugeneDokyeAnokye in C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce)
+2026-02-20 15:19:54.609 [main] DEBUG c.s.ShopjoyEcommerceSystemApplication - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-02-20 15:19:54.610 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - The following 1 profile is active: "dev"
+2026-02-20 15:19:55.486 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-02-20 15:20:00.200 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-20 15:20:01.001 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 772 ms. Found 10 JPA repository interfaces.
+2026-02-20 15:20:08.272 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-02-20 15:20:08.345 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-02-20 15:20:08.350 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-20 15:20:08.351 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-20 15:20:08.671 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 13826 ms
+2026-02-20 15:20:10.911 [main] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-20 15:20:11.281 [main] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-20 15:20:12.613 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-20 15:20:12.698 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-20 15:20:13.238 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3b4cce5a
+2026-02-20 15:20:13.244 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-20 15:20:13.747 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/shopjoy_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.1
+	Default catalog/schema: shopjoy_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-20 15:20:18.161 [main] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-20 15:20:18.341 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-20 15:20:19.954 [main] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-20 15:20:24.366 [main] DEBUG c.s.config.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-20 15:20:25.244 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-02-20 15:20:41.346 [main] INFO  o.s.g.e.DefaultSchemaResourceGraphQlSourceBuilder - Loaded 1 resource(s) in the GraphQL schema.
+2026-02-20 15:20:43.028 [main] INFO  o.s.b.g.a.GraphQlAutoConfiguration - GraphQL schema inspection:
+	Unmapped fields: {Inventory=[reservedQuantity]}
+	Unmapped registrations: {Review.user=@BatchMapping ReviewFieldResolver#user[1 args]}
+	Unmapped arguments: {}
+	Field nullness errors: {}
+	Argument nullness errors: {}
+	Skipped types: []
+2026-02-20 15:20:43.265 [main] INFO  o.s.b.g.a.s.GraphQlWebMvcAutoConfiguration - GraphQL endpoint HTTP POST /graphql
+2026-02-20 15:20:47.915 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-20 15:20:48.468 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-02-20 15:20:48.544 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-02-20 15:20:48.618 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Started ShopjoyEcommerceSystemApplication in 56.989 seconds (process running for 58.675)
+2026-02-20 15:20:48.674 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:20:48.674] ENTERING: TokenBlacklistServiceImpl.removeExpiredTokens with arguments: []
+2026-02-20 15:20:48.676 [scheduling-1] DEBUG c.s.s.impl.TokenBlacklistServiceImpl - Blacklist cleanup: No expired tokens found. Current size: 0
+2026-02-20 15:20:48.678 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:20:48.678] EXITING: TokenBlacklistServiceImpl.removeExpiredTokens returned: void
+2026-02-20 15:20:48.991 [main] INFO  c.s.config.AdminUserInitializer - Checking for existing admin user with username: admin
+2026-02-20 15:20:49.025 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1740042977 wrapping org.postgresql.jdbc.PgConnection@3b4cce5a] read-only
+2026-02-20 15:20:49.036 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:20:49.036] ENTERING: AuthServiceImpl.isUsernameTaken with arguments: [admin]
+2026-02-20 15:20:49.129 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:20:49.129] TRANSACTION START: AuthServiceImpl.isUsernameTaken(String)
+2026-02-20 15:20:49.428 [main] DEBUG org.hibernate.SQL - select u1_0.user_id from users u1_0 where u1_0.username=? fetch first ? rows only
+2026-02-20 15:20:49.468 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:20:49.468] TRANSACTION COMMIT: AuthServiceImpl.isUsernameTaken(String)
+2026-02-20 15:20:49.470 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:20:49.470] EXITING: AuthServiceImpl.isUsernameTaken returned: Boolean
+2026-02-20 15:20:49.477 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1740042977 wrapping org.postgresql.jdbc.PgConnection@3b4cce5a]
+2026-02-20 15:20:49.477 [main] INFO  c.s.config.AdminUserInitializer - Admin user 'admin' already exists, skipping creation
+2026-02-20 15:20:49.479 [main] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-02-20 15:41:36.266 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-20 15:41:36.271 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-20 15:41:36.275 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 4 ms
+2026-02-20 15:41:36.674 [http-nio-8080-exec-7] WARN  o.a.c.util.SessionIdGeneratorBase - Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [135] milliseconds.
+2026-02-20 15:41:41.340 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-20 15:41:41.746 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-20 15:41:41.768 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-20 15:41:41.773 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-02-20 15:41:41.800 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-02-20 15:42:32.441 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Starting ShopjoyEcommerceSystemApplication using Java 25.0.1 with PID 5080 (C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce\target\classes started by EugeneDokyeAnokye in C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce)
+2026-02-20 15:42:32.445 [main] DEBUG c.s.ShopjoyEcommerceSystemApplication - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-02-20 15:42:32.447 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - The following 1 profile is active: "dev"
+2026-02-20 15:42:33.902 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-02-20 15:42:38.814 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-20 15:42:39.599 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 761 ms. Found 10 JPA repository interfaces.
+2026-02-20 15:42:45.904 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-02-20 15:42:45.944 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-02-20 15:42:45.949 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-20 15:42:45.949 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-20 15:42:46.405 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 13774 ms
+2026-02-20 15:42:48.655 [main] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-20 15:42:48.828 [main] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-20 15:42:50.323 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-20 15:42:50.452 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-20 15:42:51.195 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4faccb34
+2026-02-20 15:42:51.200 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-20 15:42:51.569 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/shopjoy_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.1
+	Default catalog/schema: shopjoy_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-20 15:42:56.537 [main] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-20 15:42:56.809 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-20 15:42:57.874 [main] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-20 15:43:03.230 [main] DEBUG c.s.config.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-20 15:43:04.195 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-02-20 15:43:27.720 [main] INFO  o.s.g.e.DefaultSchemaResourceGraphQlSourceBuilder - Loaded 1 resource(s) in the GraphQL schema.
+2026-02-20 15:43:28.609 [main] INFO  o.s.b.g.a.GraphQlAutoConfiguration - GraphQL schema inspection:
+	Unmapped fields: {Inventory=[reservedQuantity]}
+	Unmapped registrations: {Review.user=@BatchMapping ReviewFieldResolver#user[1 args]}
+	Unmapped arguments: {}
+	Field nullness errors: {}
+	Argument nullness errors: {}
+	Skipped types: []
+2026-02-20 15:43:28.710 [main] INFO  o.s.b.g.a.s.GraphQlWebMvcAutoConfiguration - GraphQL endpoint HTTP POST /graphql
+2026-02-20 15:43:32.450 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-20 15:43:32.712 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-02-20 15:43:32.746 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-02-20 15:43:32.782 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Started ShopjoyEcommerceSystemApplication in 62.531 seconds (process running for 64.646)
+2026-02-20 15:43:32.820 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:43:32.819] ENTERING: TokenBlacklistServiceImpl.removeExpiredTokens with arguments: []
+2026-02-20 15:43:32.821 [scheduling-1] DEBUG c.s.s.impl.TokenBlacklistServiceImpl - Blacklist cleanup: No expired tokens found. Current size: 0
+2026-02-20 15:43:32.823 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:43:32.823] EXITING: TokenBlacklistServiceImpl.removeExpiredTokens returned: void
+2026-02-20 15:43:33.082 [main] INFO  c.s.config.AdminUserInitializer - Checking for existing admin user with username: admin
+2026-02-20 15:43:33.097 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1437634557 wrapping org.postgresql.jdbc.PgConnection@4faccb34] read-only
+2026-02-20 15:43:33.102 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:43:33.102] ENTERING: AuthServiceImpl.isUsernameTaken with arguments: [admin]
+2026-02-20 15:43:33.113 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:43:33.113] TRANSACTION START: AuthServiceImpl.isUsernameTaken(String)
+2026-02-20 15:43:33.375 [main] DEBUG org.hibernate.SQL - select u1_0.user_id from users u1_0 where u1_0.username=? fetch first ? rows only
+2026-02-20 15:43:33.429 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:43:33.429] TRANSACTION COMMIT: AuthServiceImpl.isUsernameTaken(String)
+2026-02-20 15:43:33.431 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:43:33.431] EXITING: AuthServiceImpl.isUsernameTaken returned: Boolean
+2026-02-20 15:43:33.438 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1437634557 wrapping org.postgresql.jdbc.PgConnection@4faccb34]
+2026-02-20 15:43:33.439 [main] INFO  c.s.config.AdminUserInitializer - Admin user 'admin' already exists, skipping creation
+2026-02-20 15:43:33.441 [main] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-02-20 15:43:57.247 [http-nio-8080-exec-4] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-20 15:43:57.248 [http-nio-8080-exec-4] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-20 15:43:57.252 [http-nio-8080-exec-4] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2026-02-20 15:47:38.348 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-20 15:47:38.523 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-20 15:47:38.544 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-20 15:47:38.549 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-02-20 15:47:38.590 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-02-20 15:48:26.426 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Starting ShopjoyEcommerceSystemApplication using Java 25.0.1 with PID 20452 (C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce\target\classes started by EugeneDokyeAnokye in C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce)
+2026-02-20 15:48:26.432 [main] DEBUG c.s.ShopjoyEcommerceSystemApplication - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-02-20 15:48:26.433 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - The following 1 profile is active: "dev"
+2026-02-20 15:48:27.686 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-02-20 15:48:32.637 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-20 15:48:33.385 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 716 ms. Found 10 JPA repository interfaces.
+2026-02-20 15:48:37.512 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-02-20 15:48:37.559 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-02-20 15:48:37.563 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-20 15:48:37.564 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-20 15:48:37.830 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 11238 ms
+2026-02-20 15:48:40.526 [main] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-20 15:48:40.661 [main] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-20 15:48:41.975 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-20 15:48:42.056 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-20 15:48:42.588 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@335cd031
+2026-02-20 15:48:42.591 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-20 15:48:42.807 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/shopjoy_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.1
+	Default catalog/schema: shopjoy_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-20 15:48:46.454 [main] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-20 15:48:46.623 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-20 15:48:47.829 [main] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-20 15:48:51.579 [main] DEBUG c.s.config.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-20 15:48:52.450 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-02-20 15:49:02.975 [main] INFO  o.s.g.e.DefaultSchemaResourceGraphQlSourceBuilder - Loaded 1 resource(s) in the GraphQL schema.
+2026-02-20 15:49:03.565 [main] INFO  o.s.b.g.a.GraphQlAutoConfiguration - GraphQL schema inspection:
+	Unmapped fields: {Inventory=[reservedQuantity]}
+	Unmapped registrations: {Review.user=@BatchMapping ReviewFieldResolver#user[1 args]}
+	Unmapped arguments: {}
+	Field nullness errors: {}
+	Argument nullness errors: {}
+	Skipped types: []
+2026-02-20 15:49:03.693 [main] INFO  o.s.b.g.a.s.GraphQlWebMvcAutoConfiguration - GraphQL endpoint HTTP POST /graphql
+2026-02-20 15:49:06.747 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-20 15:49:06.990 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-02-20 15:49:07.015 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-02-20 15:49:07.050 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Started ShopjoyEcommerceSystemApplication in 42.54 seconds (process running for 44.854)
+2026-02-20 15:49:07.107 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:07.107] ENTERING: TokenBlacklistServiceImpl.removeExpiredTokens with arguments: []
+2026-02-20 15:49:07.108 [scheduling-1] DEBUG c.s.s.impl.TokenBlacklistServiceImpl - Blacklist cleanup: No expired tokens found. Current size: 0
+2026-02-20 15:49:07.109 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:07.109] EXITING: TokenBlacklistServiceImpl.removeExpiredTokens returned: void
+2026-02-20 15:49:07.252 [main] INFO  c.s.config.AdminUserInitializer - Checking for existing admin user with username: admin
+2026-02-20 15:49:07.265 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@637846044 wrapping org.postgresql.jdbc.PgConnection@335cd031] read-only
+2026-02-20 15:49:07.271 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:07.271] ENTERING: AuthServiceImpl.isUsernameTaken with arguments: [admin]
+2026-02-20 15:49:07.281 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:49:07.281] TRANSACTION START: AuthServiceImpl.isUsernameTaken(String)
+2026-02-20 15:49:07.515 [main] DEBUG org.hibernate.SQL - select u1_0.user_id from users u1_0 where u1_0.username=? fetch first ? rows only
+2026-02-20 15:49:07.551 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:49:07.550] TRANSACTION COMMIT: AuthServiceImpl.isUsernameTaken(String)
+2026-02-20 15:49:07.552 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:07.552] EXITING: AuthServiceImpl.isUsernameTaken returned: Boolean
+2026-02-20 15:49:07.558 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@637846044 wrapping org.postgresql.jdbc.PgConnection@335cd031]
+2026-02-20 15:49:07.559 [main] INFO  c.s.config.AdminUserInitializer - Admin user 'admin' already exists, skipping creation
+2026-02-20 15:49:07.560 [main] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-02-20 15:49:16.251 [http-nio-8080-exec-3] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-20 15:49:16.251 [http-nio-8080-exec-3] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-20 15:49:16.254 [http-nio-8080-exec-3] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-02-20 15:49:34.993 [http-nio-8080-exec-8] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT CALLED: AuthController.login with arguments: [com.shopjoy.dto.request.LoginRequest@93b9337, SecurityContextHolderAwareRequestWrapper[ org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@30fb0e62]]
+2026-02-20 15:49:34.994 [http-nio-8080-exec-8] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@358946531 wrapping org.postgresql.jdbc.PgConnection@335cd031] read-only
+2026-02-20 15:49:34.995 [http-nio-8080-exec-8] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:34.995] ENTERING: AuthServiceImpl.login with arguments: [com.shopjoy.dto.request.LoginRequest@93b9337]
+2026-02-20 15:49:34.995 [http-nio-8080-exec-8] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:49:34.995] TRANSACTION START: AuthServiceImpl.login(LoginRequest)
+2026-02-20 15:49:35.212 [http-nio-8080-exec-8] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:35.212] ENTERING: CustomUserDetailsService.loadUserByUsername with arguments: [jane_smith]
+2026-02-20 15:49:35.222 [http-nio-8080-exec-8] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:49:35.221] TRANSACTION START: CustomUserDetailsService.loadUserByUsername(String)
+2026-02-20 15:49:35.237 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.oauth_provider,u1_0.oauth_provider_id,u1_0.password_hash,u1_0.phone,u1_0.updated_at,u1_0.user_type,u1_0.username from users u1_0 where u1_0.username=?
+2026-02-20 15:49:35.297 [http-nio-8080-exec-8] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:49:35.297] TRANSACTION COMMIT: CustomUserDetailsService.loadUserByUsername(String)
+2026-02-20 15:49:35.302 [http-nio-8080-exec-8] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:35.302] EXITING: CustomUserDetailsService.loadUserByUsername returned: CustomUserDetails
+2026-02-20 15:49:35.723 [http-nio-8080-exec-8] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:49:35.723] TRANSACTION COMMIT: AuthServiceImpl.login(LoginRequest)
+2026-02-20 15:49:35.723 [http-nio-8080-exec-8] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:35.723] EXITING: AuthServiceImpl.login returned: LoginResponse
+2026-02-20 15:49:35.725 [http-nio-8080-exec-8] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@358946531 wrapping org.postgresql.jdbc.PgConnection@335cd031]
+2026-02-20 15:49:35.733 [http-nio-8080-exec-8] INFO  c.shopjoy.aspect.PerformanceAspect - API endpoint AuthController.login responded in 740ms
+2026-02-20 15:49:35.733 [http-nio-8080-exec-8] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT COMPLETED: AuthController.login returned: ResponseEntity
+2026-02-20 15:49:35.734 [task-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:35.734] ENTERING: SecurityAuditServiceImpl.logEvent with arguments: [jane_smith, LOGIN_SUCCESS, SecurityContextHolderAwareRequestWrapper[ org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@30fb0e62], User logged in successfully, true]
+2026-02-20 15:49:35.735 [task-1] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:49:35.735] TRANSACTION START: SecurityAuditServiceImpl.logEvent(String, SecurityEventType, HttpServletRequest, String, Boolean)
+2026-02-20 15:49:35.797 [task-1] DEBUG org.hibernate.SQL - insert into security_audit_logs (details,event_type,ip_address,success,timestamp,user_agent,username) values (?,?,?,?,?,?,?)
+2026-02-20 15:49:35.824 [task-1] DEBUG c.s.s.impl.SecurityAuditServiceImpl - Logged security event: LOGIN_SUCCESS for user: jane_smith
+2026-02-20 15:49:35.825 [task-1] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:49:35.825] TRANSACTION COMMIT: SecurityAuditServiceImpl.logEvent(String, SecurityEventType, HttpServletRequest, String, Boolean)
+2026-02-20 15:49:35.826 [task-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:49:35.826] EXITING: SecurityAuditServiceImpl.logEvent returned: void
+2026-02-20 15:50:07.769 [http-nio-8080-exec-2] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:50:07.769] ENTERING: TokenBlacklistServiceImpl.isBlacklisted with arguments: [eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQ1VTVE9NRVIiLCJyb2xlcyI6IlJPTEVfQ1VTVE9NRVIiLCJ1c2VySWQiOjMsInN1YiI6ImphbmVfc21pdGgiLCJpYXQiOjE3NzE2MDI1NzUsImV4cCI6MTc3MTY4ODk3NX0.lb4T6KWH8M9zmhXDCNme0L177olDj-ycaoawUd0oKDOa1oI80pboK3imHWtrxLf8nwWRoPhsJDDAYYL_nWfB4]
+2026-02-20 15:50:07.769 [http-nio-8080-exec-2] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:50:07.769] EXITING: TokenBlacklistServiceImpl.isBlacklisted returned: Boolean
+2026-02-20 15:50:07.867 [http-nio-8080-exec-2] WARN  c.s.config.JwtAuthenticationFilter - Invalid JWT token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
+2026-02-20 15:50:07.897 [task-2] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:50:07.896] ENTERING: SecurityAuditServiceImpl.logEvent with arguments: [null, ***REDACTED***, org.springframework.security.web.header.HeaderWriterFilter$HeaderWriterRequest@6b8be27f, ***REDACTED***, false]
+2026-02-20 15:50:07.897 [task-2] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:50:07.897] TRANSACTION START: SecurityAuditServiceImpl.logEvent(String, SecurityEventType, HttpServletRequest, String, Boolean)
+2026-02-20 15:50:07.897 [task-2] ERROR c.s.s.impl.SecurityAuditServiceImpl - Failed to log security event: TOKEN_INVALID for user: null
+java.lang.IllegalStateException: The request object has been recycled and is no longer associated with this facade
+	at org.apache.catalina.connector.RequestFacade.checkFacade(RequestFacade.java:609)
+	at org.apache.catalina.connector.RequestFacade.getHeader(RequestFacade.java:287)
+	at jakarta.servlet.http.HttpServletRequestWrapper.getHeader(HttpServletRequestWrapper.java:82)
+	at org.springframework.security.web.firewall.StrictHttpFirewall$StrictFirewalledRequest.getHeader(StrictHttpFirewall.java:724)
+	at jakarta.servlet.http.HttpServletRequestWrapper.getHeader(HttpServletRequestWrapper.java:82)
+	at com.shopjoy.service.impl.SecurityAuditServiceImpl.extractClientIp(SecurityAuditServiceImpl.java:74)
+	at com.shopjoy.service.impl.SecurityAuditServiceImpl.logEvent(SecurityAuditServiceImpl.java:37)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158)
+	at org.springframework.aop.aspectj.AspectJAfterThrowingAdvice.invoke(AspectJAfterThrowingAdvice.java:63)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:168)
+	at org.springframework.aop.framework.adapter.AfterReturningAdviceInterceptor.invoke(AfterReturningAdviceInterceptor.java:56)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:168)
+	at org.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor.invoke(MethodBeforeAdviceInterceptor.java:57)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:168)
+	at org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint.proceed(MethodInvocationProceedingJoinPoint.java:82)
+	at com.shopjoy.aspect.TransactionAspect.monitorTransactionDuration(TransactionAspect.java:68)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethodWithGivenArgs(AbstractAspectJAdvice.java:648)
+	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethod(AbstractAspectJAdvice.java:630)
+	at org.springframework.aop.aspectj.AspectJAroundAdvice.invoke(AspectJAroundAdvice.java:70)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:168)
+	at org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint.proceed(MethodInvocationProceedingJoinPoint.java:82)
+	at com.shopjoy.aspect.PerformanceAspect.monitorServicePerformance(PerformanceAspect.java:34)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethodWithGivenArgs(AbstractAspectJAdvice.java:648)
+	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethod(AbstractAspectJAdvice.java:630)
+	at org.springframework.aop.aspectj.AspectJAroundAdvice.invoke(AspectJAroundAdvice.java:70)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.aspectj.AspectJAfterThrowingAdvice.invoke(AspectJAfterThrowingAdvice.java:63)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.adapter.AfterReturningAdviceInterceptor.invoke(AfterReturningAdviceInterceptor.java:56)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor.invoke(MethodBeforeAdviceInterceptor.java:57)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.interceptor.AsyncExecutionInterceptor.lambda$invoke$0(AsyncExecutionInterceptor.java:112)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-02-20 15:50:07.902 [task-2] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:50:07.902] TRANSACTION COMMIT: SecurityAuditServiceImpl.logEvent(String, SecurityEventType, HttpServletRequest, String, Boolean)
+2026-02-20 15:50:07.903 [task-2] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:50:07.903] EXITING: SecurityAuditServiceImpl.logEvent returned: void
+2026-02-20 15:50:54.809 [http-nio-8080-exec-5] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:50:54.809] ENTERING: TokenBlacklistServiceImpl.isBlacklisted with arguments: [eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQ1VTVE9NRVIiLCJyb2xlcyI6IlJPTEVfQ1VTVE9NRVIiLCJ1c2VySWQiOjMsInN1YiI6ImphbmVfc21pdGgiLCJpYXQiOjE3NzE2MDI1NzUsImV4cCI6MTc3MTY4ODk3NX0.lb4T6KWH8M9zmhXDCNme0L177olDj-ycaoawUd0oKDOa1oI80pboK3imHWtrxLf8nwWRoPhsJDDAYYL_nWfB4A]
+2026-02-20 15:50:54.809 [http-nio-8080-exec-5] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:50:54.809] EXITING: TokenBlacklistServiceImpl.isBlacklisted returned: Boolean
+2026-02-20 15:50:54.822 [http-nio-8080-exec-5] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@2136820121 wrapping org.postgresql.jdbc.PgConnection@335cd031] read-only
+2026-02-20 15:50:54.823 [http-nio-8080-exec-5] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:50:54.823] ENTERING: CustomUserDetailsService.loadUserByUsername with arguments: [jane_smith]
+2026-02-20 15:50:54.823 [http-nio-8080-exec-5] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:50:54.823] TRANSACTION START: CustomUserDetailsService.loadUserByUsername(String)
+2026-02-20 15:50:54.826 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.oauth_provider,u1_0.oauth_provider_id,u1_0.password_hash,u1_0.phone,u1_0.updated_at,u1_0.user_type,u1_0.username from users u1_0 where u1_0.username=?
+2026-02-20 15:50:54.829 [http-nio-8080-exec-5] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 15:50:54.829] TRANSACTION COMMIT: CustomUserDetailsService.loadUserByUsername(String)
+2026-02-20 15:50:54.829 [http-nio-8080-exec-5] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:50:54.829] EXITING: CustomUserDetailsService.loadUserByUsername returned: CustomUserDetails
+2026-02-20 15:50:54.830 [http-nio-8080-exec-5] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@2136820121 wrapping org.postgresql.jdbc.PgConnection@335cd031]
+2026-02-20 15:50:54.835 [http-nio-8080-exec-5] DEBUG c.s.config.JwtAuthenticationFilter - JWT authentication successful for user: jane_smith
+2026-02-20 15:50:54.854 [http-nio-8080-exec-5] WARN  c.s.exception.GlobalExceptionHandler - Resource not found: /api/demo/crsf-token
+2026-02-20 15:51:22.470 [http-nio-8080-exec-6] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:51:22.470] ENTERING: TokenBlacklistServiceImpl.isBlacklisted with arguments: [eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQ1VTVE9NRVIiLCJyb2xlcyI6IlJPTEVfQ1VTVE9NRVIiLCJ1c2VySWQiOjMsInN1YiI6ImphbmVfc21pdGgiLCJpYXQiOjE3NzE2MDI1NzUsImV4cCI6MTc3MTY4ODk3NX0.lb4T6KWH8M9zmhXDCNme0L177olDj-ycaoawUd0oKDOa1oI80pboK3imHWtrxLf8nwWRoPhsJDDAYYL_nWfB4A]
+2026-02-20 15:51:22.470 [http-nio-8080-exec-6] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:51:22.470] EXITING: TokenBlacklistServiceImpl.isBlacklisted returned: Boolean
+2026-02-20 15:51:22.479 [http-nio-8080-exec-6] WARN  c.s.exception.GlobalExceptionHandler - Resource not found: /demo/crsf-token
+2026-02-20 15:51:50.590 [http-nio-8080-exec-9] WARN  c.s.exception.GlobalExceptionHandler - Resource not found: /demo/crsf-token
+2026-02-20 15:52:09.572 [http-nio-8080-exec-10] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:52:09.572] ENTERING: TokenBlacklistServiceImpl.isBlacklisted with arguments: [eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQ1VTVE9NRVIiLCJyb2xlcyI6IlJPTEVfQ1VTVE9NRVIiLCJ1c2VySWQiOjMsInN1YiI6ImphbmVfc21pdGgiLCJpYXQiOjE3NzE2MDI1NzUsImV4cCI6MTc3MTY4ODk3NX0.lb4T6KWH8M9zmhXDCNme0L177olDj-ycaoawUd0oKDOa1oI80pboK3imHWtrxLf8nwWRoPhsJDDAYYL_nWfB4A]
+2026-02-20 15:52:09.572 [http-nio-8080-exec-10] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 15:52:09.572] EXITING: TokenBlacklistServiceImpl.isBlacklisted returned: Boolean
+2026-02-20 15:52:09.576 [http-nio-8080-exec-10] ERROR c.s.exception.GlobalExceptionHandler - Unexpected error occurred
+org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'GET' is not supported
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.handleNoMatch(RequestMappingInfoHandlerMapping.java:260)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lookupHandlerMethod(AbstractHandlerMethodMapping.java:434)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.getHandlerInternal(AbstractHandlerMethodMapping.java:376)
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.getHandlerInternal(RequestMappingInfoHandlerMapping.java:116)
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.getHandlerInternal(RequestMappingInfoHandlerMapping.java:68)
+	at org.springframework.web.servlet.handler.AbstractHandlerMapping.getHandler(AbstractHandlerMapping.java:544)
+	at org.springframework.web.servlet.DispatcherServlet.getHandler(DispatcherServlet.java:1157)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:951)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1003)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at com.shopjoy.config.JwtAuthenticationFilter.doFilterInternal(JwtAuthenticationFilter.java:141)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:493)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:354)
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:86)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:132)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:118)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:244)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:337)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:141)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1778)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-02-20 15:55:28.122 [http-nio-8080-exec-6] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT CALLED: CsrfDemoController.getCsrfToken with arguments: [***REDACTED***]
+2026-02-20 15:55:28.122 [http-nio-8080-exec-6] DEBUG c.s.controller.CsrfDemoController - CSRF token requested - Header: X-XSRF-TOKEN, Parameter: _csrf
+2026-02-20 15:55:28.123 [http-nio-8080-exec-6] INFO  c.shopjoy.aspect.PerformanceAspect - API endpoint CsrfDemoController.getCsrfToken responded in 0ms
+2026-02-20 15:55:28.123 [http-nio-8080-exec-6] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT COMPLETED: CsrfDemoController.getCsrfToken returned: ResponseEntity
+2026-02-20 15:56:35.947 [http-nio-8080-exec-4] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT CALLED: CsrfDemoController.submitForm with arguments: [CsrfDemoController.FormSubmissionRequest(name=Test User, message=Testing CSRF protection)]
+2026-02-20 15:56:35.948 [http-nio-8080-exec-4] INFO  c.s.controller.CsrfDemoController - Form submitted successfully with CSRF protection - Name: Test User, Message: Testing CSRF protection
+2026-02-20 15:56:35.950 [http-nio-8080-exec-4] INFO  c.shopjoy.aspect.PerformanceAspect - API endpoint CsrfDemoController.submitForm responded in 3ms
+2026-02-20 15:56:35.951 [http-nio-8080-exec-4] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT COMPLETED: CsrfDemoController.submitForm returned: ResponseEntity

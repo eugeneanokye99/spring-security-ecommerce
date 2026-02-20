@@ -542,6 +542,815 @@ mutation {
 }
 ```
 
+## Security Implementation
+
+### Spring Security Architecture
+
+This application implements a comprehensive **Spring Security** framework with JWT-based stateless authentication, role-based authorization, OAuth2 social login, and advanced security features including token blacklisting and security audit logging.
+
+#### 🏗️ Security Components
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Spring Security Layer                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              JwtAuthenticationFilter                      │  │
+│  │  • Intercepts all HTTP requests                          │  │
+│  │  • Extracts JWT from Authorization header                │  │
+│  │  • Checks token blacklist (logout validation)            │  │
+│  │  • Validates token signature and expiration              │  │
+│  │  • Sets SecurityContext with authenticated user          │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │           SecurityFilterChain Configuration               │  │
+│  │  ┌─────────────────┐      ┌─────────────────┐            │  │
+│  │  │ Form Endpoints  │      │  API Endpoints  │            │  │
+│  │  │   /demo/**      │      │   /api/**       │            │  │
+│  │  │                 │      │   /graphql      │            │  │
+│  │  │ ✅ CSRF Enabled │      │ ❌ CSRF Disabled│            │  │
+│  │  │ 🍪 Cookies      │      │ 🔑 JWT Tokens   │            │  │
+│  │  └─────────────────┘      └─────────────────┘            │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              Role-Based Authorization                     │  │
+│  │  • @PreAuthorize("hasRole('ADMIN')")                     │  │
+│  │  • @PreAuthorize("isAuthenticated()")                    │  │
+│  │  • Method-level security with @EnableMethodSecurity      │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              OAuth2 Social Login                          │  │
+│  │  • Google OAuth 2.0 integration                          │  │
+│  │  • Custom success handler with JWT generation            │  │
+│  │  • Automatic user creation/update                        │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │           Token Blacklist Service                         │  │
+│  │  • ConcurrentHashMap for revoked tokens                  │  │
+│  │  • Scheduled cleanup of expired tokens (hourly)          │  │
+│  │  • Memory leak prevention (10,000 token limit)           │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │           Security Audit Logging                          │  │
+│  │  • LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT                  │  │
+│  │  • ACCESS_DENIED, TOKEN_REFRESH                          │  │
+│  │  • ORDER_CREATED, PAYMENT_COMPLETED                      │  │
+│  │  • Async logging to security_audit_logs table            │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Authentication Flow
+
+#### 1️⃣ User Registration
+
+**Endpoint**: `POST /api/v1/auth/register`
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
+    "email": "john@example.com",
+    "password": "SecurePass123!",
+    "firstName": "John",
+    "lastName": "Doe"
+  }'
+```
+
+**Response** (201 Created):
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 123,
+    "username": "johndoe",
+    "email": "john@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "userType": "CUSTOMER",
+    "createdAt": "2026-02-20T10:30:00"
+  },
+  "message": "User registered successfully"
+}
+```
+
+**What Happens Internally**:
+1. Password hashed using BCrypt (cost factor: 10)
+2. User entity created with `UserType.CUSTOMER`
+3. Stored in PostgreSQL `users` table
+4. Security audit event logged: `USER_REGISTRATION`
+
+#### 2️⃣ User Login (JWT Token Generation)
+
+**Endpoint**: `POST /api/v1/auth/login`
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
+    "password": "SecurePass123!"
+  }'
+```
+
+**Response** (200 OK):
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxMjMsInJvbGUiOiJDVVNUT01FUiIsImlhdCI6MTcwODQyMTQwMCwiZXhwIjoxNzA4NTA3ODAwfQ.signature",
+    "type": "Bearer",
+    "expiresIn": 86400000,
+    "user": {
+      "userId": 123,
+      "username": "johndoe",
+      "email": "john@example.com",
+      "userType": "CUSTOMER"
+    }
+  },
+  "message": "Login successful"
+}
+```
+
+**What Happens Internally**:
+1. Username/password validated against database
+2. BCrypt compares provided password with stored hash
+3. JWT token generated with user claims (see JWT structure below)
+4. Token expiration set to 24 hours
+5. Security audit event logged: `LOGIN_SUCCESS`
+6. If authentication fails: `LOGIN_FAILURE` event logged
+
+#### 3️⃣ Using JWT Token for API Requests
+
+**Example**: Get User Orders
+
+```bash
+curl -X GET http://localhost:8080/api/v1/orders/user/123 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+**Request Flow**:
+```
+1. Client Request
+   ↓
+   Authorization: Bearer <JWT_TOKEN>
+   ↓
+2. JwtAuthenticationFilter intercepts request
+   ↓
+   • Extracts token from header
+   • Checks if token is blacklisted (logged out)
+   • Validates token signature using secret key
+   • Checks token expiration
+   ↓
+3. If Valid:
+   • Extract username from token
+   • Load user details from database
+   • Create Authentication object
+   • Set in SecurityContext
+   ↓
+4. Controller Method Executes
+   ↓
+   • @PreAuthorize checks pass
+   • Business logic executes
+   • Response returned
+   ↓
+5. If Invalid:
+   • Return 401 Unauthorized
+   • Log ACCESS_DENIED event
+```
+
+#### 4️⃣ OAuth2 Social Login (Google)
+
+**Flow**:
+
+1. **Frontend initiates OAuth2 flow**:
+   ```javascript
+   window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+   ```
+
+2. **User redirected to Google consent screen**
+
+3. **User grants permission**
+
+4. **Google redirects back to application with authorization code**
+
+5. **Spring Security exchanges code for access token**
+
+6. **OAuth2LoginSuccessHandler processes login**:
+   ```java
+   • Retrieves user profile from Google
+   • Checks if user exists in database (by email)
+   • If new: Creates user account automatically
+   • If existing: Updates OAuth provider info
+   • Generates JWT token
+   • Logs LOGIN_SUCCESS security event
+   • Redirects to frontend with token: 
+     http://localhost:5173/oauth2/callback?token=<JWT>&provider=google
+   ```
+
+7. **Frontend stores JWT and uses for subsequent requests**
+
+#### 5️⃣ User Logout (Token Blacklisting)
+
+**Endpoint**: `POST /api/v1/auth/logout`
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+**Response** (200 OK):
+```json
+{
+  "success": true,
+  "data": null,
+  "message": "Logout successful"
+}
+```
+
+**What Happens Internally**:
+1. Extract JWT token from Authorization header
+2. Add token to blacklist (ConcurrentHashMap)
+3. Extract expiration time from token
+4. Store: `Map<Token, ExpirationTime>`
+5. Log security audit event: `LOGOUT`
+6. Token now rejected by JwtAuthenticationFilter
+7. User must re-authenticate to get new token
+
+**Token Blacklist Cleanup**:
+- Scheduled task runs every hour (`@Scheduled(fixedRate = 3600000)`)
+- Removes expired tokens from blacklist
+- Prevents memory leaks
+- Maximum 10,000 tokens stored (with warnings)
+
+### JWT Token Structure
+
+#### Token Anatomy
+
+A JWT token consists of three parts separated by dots (`.`):
+
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9  .  eyJzdWIiOiJqb2huZG9lIiwi...  .  SflKxwRJSMeKKF2QT4fwpM...
+        ↓ HEADER                             ↓ PAYLOAD                        ↓ SIGNATURE
+```
+
+#### 1. Header (Algorithm & Token Type)
+
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+
+- `alg`: HMAC SHA-256 algorithm for signing
+- `typ`: Token type (JWT)
+
+#### 2. Payload (Claims)
+
+```json
+{
+  "sub": "johndoe",
+  "userId": 123,
+  "role": "CUSTOMER",
+  "iat": 1708421400,
+  "exp": 1708507800
+}
+```
+
+**Standard Claims**:
+- `sub` (subject): Username
+- `iat` (issued at): Token creation timestamp (Unix)
+- `exp` (expiration): Token expiration timestamp (Unix)
+
+**Custom Claims**:
+- `userId`: Database user ID
+- `role`: User role (CUSTOMER or ADMIN)
+
+#### 3. Signature (Verification)
+
+```
+HMACSHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  secret_key
+)
+```
+
+**Secret Key Configuration**:
+```properties
+# application.yml
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F...}
+  expiration: ${JWT_EXPIRATION:86400000}  # 24 hours
+```
+
+**Security Notes**:
+- Secret key is 256-bit (32 bytes) minimum
+- Stored in environment variable for production
+- Token cannot be tampered with (signature validation fails)
+- Token cannot be forged without secret key
+
+#### Decoding JWT (for debugging)
+
+```bash
+# Using jwt.io or jq
+echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." | \
+  cut -d'.' -f2 | \
+  base64 -d | \
+  jq .
+
+# Output:
+{
+  "sub": "johndoe",
+  "userId": 123,
+  "role": "CUSTOMER",
+  "iat": 1708421400,
+  "exp": 1708507800
+}
+```
+
+### Authorization Roles & Permissions
+
+#### User Roles
+
+| Role | Description | Default Assignment |
+|------|-------------|-------------------|
+| `CUSTOMER` | Regular user, can browse and purchase | Registration |
+| `ADMIN` | Administrator, full system access | Manual assignment |
+
+#### Role-Based Access Control
+
+##### Public Endpoints (No Authentication Required)
+
+```java
+// Registration & Login
+POST   /api/v1/auth/register       → Any user
+POST   /api/v1/auth/login          → Any user
+
+// OAuth2 Login
+GET    /oauth2/authorization/google → Any user
+
+// Public browsing (read-only)
+GET    /api/v1/products/**          → Any user
+GET    /api/v1/categories/**        → Any user
+GET    /api/v1/reviews/**           → Any user
+GET    /api/v1/inventory/**         → Any user
+```
+
+##### Customer Endpoints (CUSTOMER role)
+
+```java
+// Profile Management
+GET    /api/v1/users/{id}           → Own profile only
+PUT    /api/v1/users/{id}           → Own profile only
+
+// Shopping Cart
+GET    /api/v1/cart/user/{userId}   → Own cart only
+POST   /api/v1/cart                 → Authenticated
+PUT    /api/v1/cart/{id}            → Own items only
+DELETE /api/v1/cart/{id}            → Own items only
+
+// Orders
+POST   /api/v1/orders               → Create own order
+GET    /api/v1/orders/user/{userId} → View own orders
+GET    /api/v1/orders/{id}          → View own order
+PUT    /api/v1/orders/{id}          → Update own order
+
+// Reviews
+POST   /api/v1/reviews              → Create review
+PUT    /api/v1/reviews/{id}         → Update own review
+DELETE /api/v1/reviews/{id}         → Delete own review
+
+// Addresses
+POST   /api/v1/addresses            → Create own address
+GET    /api/v1/addresses/user/{id}  → View own addresses
+PUT    /api/v1/addresses/{id}       → Update own address
+DELETE /api/v1/addresses/{id}       → Delete own address
+
+// GraphQL Queries
+query orders(userId: $myId)         → Own orders only
+query cartItems(userId: $myId)      → Own cart only
+```
+
+##### Admin Endpoints (ADMIN role only)
+
+```java
+// User Management
+GET    /api/v1/users                → @PreAuthorize("hasRole('ADMIN')")
+DELETE /api/v1/users/{id}           → @PreAuthorize("hasRole('ADMIN')")
+
+// Product Management
+POST   /api/v1/products              → hasRole('ADMIN')
+PUT    /api/v1/products/{id}         → hasRole('ADMIN')
+PATCH  /api/v1/products/{id}         → hasRole('ADMIN')
+DELETE /api/v1/products/{id}         → hasRole('ADMIN')
+
+// Category Management
+POST   /api/v1/categories            → hasRole('ADMIN')
+PUT    /api/v1/categories/{id}       → hasRole('ADMIN')
+DELETE /api/v1/categories/{id}       → hasRole('ADMIN')
+
+// Inventory Management
+POST   /api/v1/inventory             → hasRole('ADMIN')
+PUT    /api/v1/inventory/{id}        → hasRole('ADMIN')
+PATCH  /api/v1/inventory/{id}        → hasRole('ADMIN')
+
+// Order Management
+PUT    /api/v1/orders/{id}/status    → hasRole('ADMIN')
+POST   /api/v1/orders/{id}/confirm   → hasRole('ADMIN')
+DELETE /api/v1/orders/{id}           → hasRole('ADMIN')
+
+// Review Moderation
+PUT    /api/v1/reviews/{id}          → hasRole('ADMIN')
+DELETE /api/v1/reviews/{id}          → hasRole('ADMIN')
+
+// Security Audit Logs
+GET    /api/v1/security-audit-logs/** → hasRole('ADMIN')
+
+// GraphQL Admin Queries
+query users                          → @PreAuthorize("hasRole('ADMIN')")
+query lowStockProducts               → @PreAuthorize("hasRole('ADMIN')")
+mutation updateOrderStatus           → @PreAuthorize("hasRole('ADMIN')")
+mutation deleteOrder                 → @PreAuthorize("hasRole('ADMIN')")
+```
+
+#### Method-Level Security Examples
+
+```java
+// Controller level
+@RestController
+@RequestMapping("/api/v1/admin")
+@PreAuthorize("hasRole('ADMIN')")  // All methods require ADMIN
+public class AdminController {
+    // ...
+}
+
+// Method level
+@GetMapping("/users")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<List<UserResponse>> getAllUsers() {
+    // Only admins can access
+}
+
+// GraphQL resolver level
+@QueryMapping
+@PreAuthorize("hasRole('ADMIN')")
+public UserConnection users(@Argument Integer page, @Argument Integer size) {
+    // Only admins can query all users
+}
+
+// Complex expressions
+@PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
+public ResponseEntity<OrderResponse> getOrder(@PathVariable Integer userId) {
+    // Admin OR owner can access
+}
+
+@PreAuthorize("isAuthenticated()")
+public ResponseEntity<CartResponse> getCart() {
+    // Any authenticated user
+}
+```
+
+### CORS Configuration
+
+#### Allowed Origins
+
+```java
+// CorsConfig.java
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+    
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins(
+                    "http://localhost:5173",      // Vite dev server
+                    "http://localhost:3000",      // React/Next.js dev
+                    "http://localhost:5174",      // Alternative Vite port
+                    "http://localhost:8080",      // Same origin
+                    "http://127.0.0.1:5173",      // Localhost IP variant
+                    "http://127.0.0.1:3000",
+                    "http://127.0.0.1:8080"
+                )
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600);  // Cache preflight for 1 hour
+    }
+}
+```
+
+#### Configuration Properties
+
+```yaml
+# application.yml
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+```
+
+**Environment Variable Override** (Production):
+```bash
+export CORS_ALLOWED_ORIGINS=https://yourapp.com,https://www.yourapp.com
+```
+
+#### CORS Headers Explained
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `Access-Control-Allow-Origin` | `http://localhost:5173` | Allowed origin |
+| `Access-Control-Allow-Methods` | `GET, POST, PUT, DELETE, PATCH` | Allowed HTTP methods |
+| `Access-Control-Allow-Headers` | `*` | Allowed request headers |
+| `Access-Control-Allow-Credentials` | `true` | Allow cookies/auth headers |
+| `Access-Control-Max-Age` | `3600` | Cache preflight response |
+
+#### Preflight Requests (OPTIONS)
+
+For requests with:
+- Custom headers (`Authorization`, `X-CSRF-TOKEN`)
+- Methods other than GET/POST
+- Content-Type other than `application/x-www-form-urlencoded`
+
+Browser sends preflight OPTIONS request:
+
+```http
+OPTIONS /api/v1/products HTTP/1.1
+Origin: http://localhost:5173
+Access-Control-Request-Method: DELETE
+Access-Control-Request-Headers: Authorization
+```
+
+Server responds with allowed operations:
+
+```http
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: http://localhost:5173
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH
+Access-Control-Allow-Headers: Authorization, Content-Type
+Access-Control-Max-Age: 3600
+```
+
+### Token Blacklist & Logout Mechanism
+
+#### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│            Token Blacklist Service Architecture             │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │       ConcurrentHashMap<Token, ExpirationTime>     │    │
+│  │                                                     │    │
+│  │  Key: JWT token (String)                           │    │
+│  │  Value: Token expiration (LocalDateTime)           │    │
+│  │                                                     │    │
+│  │  Max Size: 10,000 tokens                           │    │
+│  │  Thread-Safe: Yes (ConcurrentHashMap)              │    │
+│  └────────────────────────────────────────────────────┘    │
+│                                                              │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │              Operations                             │    │
+│  │  • blacklistToken(token) → Add to blacklist        │    │
+│  │  • isBlacklisted(token) → Check if blacklisted     │    │
+│  │  • removeExpiredTokens() → Cleanup task            │    │
+│  │  • getBlacklistSize() → Get current size           │    │
+│  │  • clearBlacklist() → Clear all (admin)            │    │
+│  └────────────────────────────────────────────────────┘    │
+│                                                              │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │         Scheduled Cleanup (@Scheduled)              │    │
+│  │                                                     │    │
+│  │  • Runs every hour (3600000 ms)                    │    │
+│  │  • Removes tokens where:                           │    │
+│  │    expirationTime < LocalDateTime.now()            │    │
+│  │  • Logs cleanup statistics                         │    │
+│  │  • Prevents memory leaks                           │    │
+│  └────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Implementation Details
+
+##### 1. Blacklisting Token on Logout
+
+```java
+@PostMapping("/logout")
+public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
+    String token = authHeader.substring(7);  // Remove "Bearer "
+    
+    // Add to blacklist with expiration time
+    tokenBlacklistService.blacklistToken(token);
+    
+    // Log security event
+    securityAuditService.logEvent(
+        username,
+        SecurityEventType.LOGOUT,
+        request,
+        "User logged out successfully",
+        true
+    );
+    
+    return ResponseEntity.ok(ApiResponse.success(null, "Logout successful"));
+}
+```
+
+##### 2. Checking Blacklist on Every Request
+
+```java
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, 
+                                   HttpServletResponse response,
+                                   FilterChain filterChain) {
+        String token = extractToken(request);
+        
+        // Check if token is blacklisted
+        if (tokenBlacklistService.isBlacklisted(token)) {
+            log.debug("Token is blacklisted (user logged out)");
+            securityAuditService.logEvent(
+                null,
+                SecurityEventType.ACCESS_DENIED,
+                request,
+                "Attempted to use blacklisted token",
+                false
+            );
+            filterChain.doFilter(request, response);
+            return;  // Reject request
+        }
+        
+        // Continue with token validation...
+    }
+}
+```
+
+##### 3. Scheduled Token Cleanup
+
+```java
+@Service
+public class TokenBlacklistServiceImpl implements TokenBlacklistService {
+    
+    private final ConcurrentHashMap<String, LocalDateTime> blacklistedTokens;
+    private static final int MAX_BLACKLIST_SIZE = 10000;
+    
+    @Scheduled(fixedRate = 3600000)  // Every hour
+    @Override
+    public void removeExpiredTokens() {
+        LocalDateTime now = LocalDateTime.now();
+        int initialSize = blacklistedTokens.size();
+        
+        blacklistedTokens.entrySet().removeIf(entry -> {
+            boolean isExpired = entry.getValue().isBefore(now);
+            if (isExpired) {
+                log.trace("Removing expired token from blacklist");
+            }
+            return isExpired;
+        });
+        
+        int removedCount = initialSize - blacklistedTokens.size();
+        log.info("Blacklist cleanup: Removed {} expired tokens. " +
+                 "Current size: {}", removedCount, blacklistedTokens.size());
+    }
+}
+```
+
+#### Logout Flow Diagram
+
+```
+User                 Frontend              Backend                 Blacklist Service
+ |                      |                      |                          |
+ | 1. Click Logout      |                      |                          |
+ |--------------------->|                      |                          |
+ |                      |                      |                          |
+ |                      | 2. POST /api/v1/auth/logout                    |
+ |                      |    Authorization: Bearer <token>                |
+ |                      |--------------------->|                          |
+ |                      |                      |                          |
+ |                      |                      | 3. Extract token          |
+ |                      |                      | 4. blacklistToken()       |
+ |                      |                      |------------------------->|
+ |                      |                      |                          |
+ |                      |                      |                5. Add to  |
+ |                      |                      |                HashMap    |
+ |                      |                      |                with exp   |
+ |                      |                      |<-------------------------|
+ |                      |                      |                          |
+ |                      |                      | 6. Log LOGOUT event      |
+ |                      |                      |                          |
+ |                      | 7. 200 OK            |                          |
+ |                      |<---------------------|                          |
+ |                      |                      |                          |
+ | 8. Clear localStorage|                      |                          |
+ |<---------------------|                      |                          |
+ |                      |                      |                          |
+ | 9. Redirect to login |                      |                          |
+ |                      |                      |                          |
+ |                      |                      |                          |
+ | ... Later attempt to use same token ...     |                          |
+ |                      |                      |                          |
+ |                      | GET /api/v1/orders   |                          |
+ |                      |    Authorization: Bearer <blacklisted-token>    |
+ |                      |--------------------->|                          |
+ |                      |                      |                          |
+ |                      |                      | isBlacklisted(token)?    |
+ |                      |                      |------------------------->|
+ |                      |                      |                          |
+ |                      |                      |        true              |
+ |                      |                      |<-------------------------|
+ |                      |                      |                          |
+ |                      | 401 Unauthorized     |                          |
+ |                      |<---------------------|                          |
+ |                      |                      |                          |
+ | "Please login again" |                      |                          |
+ |<---------------------|                      |                          |
+```
+
+#### Memory Management
+
+**Why Cleanup is Necessary**:
+- Blacklist grows with every logout
+- Old tokens remain in memory until removed
+- Without cleanup: memory leak over time
+
+**Cleanup Strategy**:
+1. **Scheduled Removal**: Every hour, remove expired tokens
+2. **Size Limit**: Warn when approaching 10,000 tokens
+3. **Forced Cleanup**: If size limit reached, run cleanup immediately
+
+**Example Log Output**:
+```
+2026-02-20 14:00:00 INFO  TokenBlacklistServiceImpl - Blacklist cleanup: Removed 247 expired tokens. Current size: 1853
+2026-02-20 15:00:00 INFO  TokenBlacklistServiceImpl - Blacklist cleanup: Removed 189 expired tokens. Current size: 1664
+2026-02-20 15:23:45 WARN  TokenBlacklistServiceImpl - Blacklist approaching maximum size (9885). Running cleanup...
+```
+
+### Security Best Practices
+
+#### ✅ Implemented Security Features
+
+1. **Password Security**
+   - BCrypt hashing with cost factor 10
+   - Minimum 8 characters required
+   - Special character requirements enforced
+   - Password never logged or exposed in responses
+
+2. **Token Security**
+   - 256-bit secret key (32 bytes minimum)
+   - HMAC SHA-256 signing algorithm
+   - 24-hour token expiration
+   - Token blacklisting on logout
+   - Signature validation on every request
+
+3. **Transport Security**
+   - CORS whitelist (no wildcard with credentials)
+   - CSRF protection for session endpoints
+   - Secure headers configuration (in production)
+   - HTTPS enforcement (production)
+
+4. **Authorization**
+   - Role-based access control (RBAC)
+   - Method-level security annotations
+   - Ownership validation (users can only access own data)
+   - Admin-only operations properly protected
+
+5. **Audit & Monitoring**
+   - Security events logged to database
+   - Login attempts tracked (success/failure)
+   - Token blacklist operations logged
+   - Dangerous operations audited (DELETE, status changes)
+
+#### 🔒 Production Security Checklist
+
+- [ ] Use environment variables for secrets (not hardcoded)
+- [ ] Enable HTTPS with valid SSL certificate
+- [ ] Set `Secure; HttpOnly; SameSite=Strict` for cookies
+- [ ] Whitelist specific origins for CORS (remove localhost)
+- [ ] Rotate JWT secret key periodically
+- [ ] Implement rate limiting for login endpoints
+- [ ] Enable Spring Security's default headers:
+  ```java
+  http.headers(headers -> headers
+      .contentSecurityPolicy("default-src 'self'")
+      .frameOptions().deny()
+      .xssProtection()
+      .and()
+  );
+  ```
+- [ ] Monitor security audit logs for suspicious activity
+- [ ] Implement account lockout after failed login attempts
+- [ ] Add JWT refresh token mechanism for long sessions
+- [ ] Configure database connection encryption
+- [ ] Enable Spring Boot Actuator security for monitoring endpoints
+
 ### Security: CORS and CSRF Protection
 
 This application implements **dual security strategies** for different endpoint types:
