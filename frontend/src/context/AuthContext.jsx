@@ -62,14 +62,39 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    /**
+     * OAuth2-specific login function
+     * Handles authentication with pre-validated user data and JWT token
+     * 
+     * @param {Object} userData - User object from decoded JWT
+     * @param {string} token - JWT token from OAuth2 backend
+     */
+    const loginWithOAuth2 = (userData, token) => {
+        try {
+            // Store token and user data
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(userData));
+            
+            // Update context state
+            setUser(userData);
+            
+            console.log('OAuth2 login successful:', userData);
+        } catch (error) {
+            console.error('OAuth2 login error:', error);
+            throw new Error('Failed to complete OAuth2 login');
+        }
+    };
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
     };
 
     const value = {
         user,
         login,
+        loginWithOAuth2,
         logout,
         loading,
         isAuthenticated: !!user,

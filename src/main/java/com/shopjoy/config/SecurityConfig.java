@@ -42,7 +42,7 @@ public class SecurityConfig {
     }
 
     /**
-     * Configures the security filter chain with JWT authentication and authorization rules.
+     * Configures the security filter chain with JWT authentication, OAuth2 login, and authorization rules.
      *
      * @param http HttpSecurity configuration
      * @return configured SecurityFilterChain
@@ -55,12 +55,17 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/customer/**").hasAnyRole("CUSTOMER", "ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oAuth2LoginSuccessHandler)
+                .failureUrl("/login?error=oauth2_failed")
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         

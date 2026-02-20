@@ -55,3 +55,85 @@
 2026-02-20 10:06:17.210 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@365194469 wrapping org.postgresql.jdbc.PgConnection@4ebe6c24]
 2026-02-20 10:06:17.211 [main] INFO  c.s.config.AdminUserInitializer - Admin user 'admin' already exists, skipping creation
 2026-02-20 10:06:17.211 [main] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-02-20 10:06:56.698 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-20 10:06:56.699 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-20 10:06:56.701 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-02-20 10:06:56.972 [http-nio-8080-exec-1] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT CALLED: AuthController.login with arguments: [com.shopjoy.dto.request.LoginRequest@44e40947]
+2026-02-20 10:06:56.973 [http-nio-8080-exec-1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1731459464 wrapping org.postgresql.jdbc.PgConnection@4ebe6c24] read-only
+2026-02-20 10:06:56.973 [http-nio-8080-exec-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 10:06:56.973] ENTERING: AuthServiceImpl.login with arguments: [com.shopjoy.dto.request.LoginRequest@44e40947]
+2026-02-20 10:06:56.973 [http-nio-8080-exec-1] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 10:06:56.973] TRANSACTION START: AuthServiceImpl.login(LoginRequest)
+2026-02-20 10:06:57.108 [http-nio-8080-exec-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 10:06:57.107] ENTERING: CustomUserDetailsService.loadUserByUsername with arguments: [admin]
+2026-02-20 10:06:57.110 [http-nio-8080-exec-1] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 10:06:57.110] TRANSACTION START: CustomUserDetailsService.loadUserByUsername(String)
+2026-02-20 10:06:57.118 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.password_hash,u1_0.phone,u1_0.updated_at,u1_0.user_type,u1_0.username from users u1_0 where u1_0.username=?
+2026-02-20 10:06:57.156 [http-nio-8080-exec-1] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 10:06:57.156] TRANSACTION COMMIT: CustomUserDetailsService.loadUserByUsername(String)
+2026-02-20 10:06:57.157 [http-nio-8080-exec-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 10:06:57.157] EXITING: CustomUserDetailsService.loadUserByUsername returned: CustomUserDetails
+2026-02-20 10:06:57.444 [http-nio-8080-exec-1] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 10:06:57.444] TRANSACTION COMMIT: AuthServiceImpl.login(LoginRequest)
+2026-02-20 10:06:57.445 [http-nio-8080-exec-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 10:06:57.445] EXITING: AuthServiceImpl.login returned: LoginResponse
+2026-02-20 10:06:57.445 [http-nio-8080-exec-1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1731459464 wrapping org.postgresql.jdbc.PgConnection@4ebe6c24]
+2026-02-20 10:06:57.448 [http-nio-8080-exec-1] INFO  c.shopjoy.aspect.PerformanceAspect - API endpoint AuthController.login responded in 476ms
+2026-02-20 10:06:57.450 [http-nio-8080-exec-1] INFO  com.shopjoy.aspect.LoggingAspect - API ENDPOINT COMPLETED: AuthController.login returned: ResponseEntity
+2026-02-20 10:53:26.016 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-20 10:53:26.036 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-20 10:53:26.068 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-20 10:53:26.081 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-02-20 10:53:26.099 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-02-20 10:58:54.786 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Starting ShopjoyEcommerceSystemApplication using Java 25.0.1 with PID 20284 (C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce\target\classes started by EugeneDokyeAnokye in C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce)
+2026-02-20 10:58:54.803 [main] DEBUG c.s.ShopjoyEcommerceSystemApplication - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-02-20 10:58:54.805 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - The following 1 profile is active: "dev"
+2026-02-20 10:58:56.687 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-02-20 10:59:01.600 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-20 10:59:02.358 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 728 ms. Found 9 JPA repository interfaces.
+2026-02-20 10:59:08.044 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-02-20 10:59:08.102 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-02-20 10:59:08.113 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-20 10:59:08.114 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-20 10:59:08.480 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 13500 ms
+2026-02-20 10:59:10.772 [main] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-20 10:59:11.185 [main] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-20 10:59:12.953 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-20 10:59:13.090 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-20 10:59:13.800 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@106e6dfe
+2026-02-20 10:59:13.804 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-20 10:59:14.043 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/shopjoy_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.1
+	Default catalog/schema: shopjoy_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-20 10:59:19.035 [main] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-20 10:59:19.373 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-20 10:59:21.045 [main] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-20 10:59:22.690 [main] DEBUG c.s.config.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-20 10:59:23.505 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-02-20 10:59:37.548 [main] INFO  o.s.g.e.DefaultSchemaResourceGraphQlSourceBuilder - Loaded 1 resource(s) in the GraphQL schema.
+2026-02-20 10:59:38.265 [main] INFO  o.s.b.g.a.GraphQlAutoConfiguration - GraphQL schema inspection:
+	Unmapped fields: {Inventory=[reservedQuantity]}
+	Unmapped registrations: {Review.user=@BatchMapping ReviewFieldResolver#user[1 args]}
+	Unmapped arguments: {}
+	Field nullness errors: {}
+	Argument nullness errors: {}
+	Skipped types: []
+2026-02-20 10:59:38.396 [main] INFO  o.s.b.g.a.s.GraphQlWebMvcAutoConfiguration - GraphQL endpoint HTTP POST /graphql
+2026-02-20 10:59:41.999 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-20 10:59:42.298 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-02-20 10:59:42.322 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-02-20 10:59:42.355 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Started ShopjoyEcommerceSystemApplication in 49.124 seconds (process running for 50.538)
+2026-02-20 10:59:42.631 [main] INFO  c.s.config.AdminUserInitializer - Checking for existing admin user with username: admin
+2026-02-20 10:59:42.652 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1755163228 wrapping org.postgresql.jdbc.PgConnection@106e6dfe] read-only
+2026-02-20 10:59:42.666 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 10:59:42.665] ENTERING: AuthServiceImpl.isUsernameTaken with arguments: [admin]
+2026-02-20 10:59:42.681 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 10:59:42.680] TRANSACTION START: AuthServiceImpl.isUsernameTaken(String)
+2026-02-20 10:59:42.964 [main] DEBUG org.hibernate.SQL - select u1_0.user_id from users u1_0 where u1_0.username=? fetch first ? rows only
+2026-02-20 10:59:43.020 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-20 10:59:43.018] TRANSACTION COMMIT: AuthServiceImpl.isUsernameTaken(String)
+2026-02-20 10:59:43.023 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-20 10:59:43.023] EXITING: AuthServiceImpl.isUsernameTaken returned: Boolean
+2026-02-20 10:59:43.033 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1755163228 wrapping org.postgresql.jdbc.PgConnection@106e6dfe]
+2026-02-20 10:59:43.035 [main] INFO  c.s.config.AdminUserInitializer - Admin user 'admin' already exists, skipping creation
+2026-02-20 10:59:43.037 [main] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-02-20 11:00:09.185 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-20 11:00:09.185 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-20 11:00:09.188 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms

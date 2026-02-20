@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import OAuth2Callback from './pages/OAuth2Callback';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
 
@@ -66,6 +67,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/oauth2/callback" element={<OAuth2Callback />} />
           <Route
             path="/admin/*"
             element={
