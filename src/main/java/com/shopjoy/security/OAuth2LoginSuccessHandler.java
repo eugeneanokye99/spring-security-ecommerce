@@ -4,12 +4,11 @@ import com.shopjoy.entity.User;
 import com.shopjoy.entity.UserType;
 import com.shopjoy.repository.UserRepository;
 import com.shopjoy.util.JwtUtil;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -33,8 +32,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    @Value("${cors.allowed-origins}")
-    private String allowedOrigins;
 
     /**
      * Called when OAuth2 authentication succeeds.
@@ -44,12 +41,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
      * @param response       the response
      * @param authentication the <tt>Authentication</tt> object which was created during authentication process
      * @throws IOException      if an input or output error occurs
-     * @throws ServletException if a servlet error occurs
      */
     @Override
     @Transactional
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                        Authentication authentication) throws IOException {
         
         log.info("OAuth2 authentication successful for user: {}", authentication.getName());
         
@@ -58,6 +54,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
             
             // Get attributes from OAuth2 provider
+            assert oAuth2User != null;
             Map<String, Object> attributes = oAuth2User.getAttributes();
             String email = (String) attributes.get("email");
             String name = (String) attributes.get("name");
@@ -102,7 +99,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             log.info("JWT token generated for OAuth2 user: {}", user.getUsername());
             
             // Redirect to frontend with token
-            String frontendUrl = getFrontendBaseUrl();
+            String frontendUrl = "http://localhost:5173";
             String redirectUrl = String.format("%s/oauth2/callback?token=%s&provider=%s", 
                     frontendUrl, jwtToken, provider);
             
@@ -209,26 +206,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         
         return "unknown";
     }
-    
-    /**
-     * Gets the frontend base URL from allowed origins.
-     *
-     * @return the frontend base URL
-     */
-    private String getFrontendBaseUrl() {
-        // Get the first allowed origin as the default frontend URL
-        if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
-            String[] origins = allowedOrigins.split(",");
-            // Prefer localhost:5173 (Vite default) or localhost:3000 (React default)
-            for (String origin : origins) {
-                if (origin.contains("5173") || origin.contains("3000")) {
-                    return origin.trim();
-                }
-            }
-            return origins[0].trim();
-        }
-        return "http://localhost:5173";
-    }
+
     
     /**
      * Redirects to frontend with an error message.
@@ -238,7 +216,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
      * @throws IOException if redirect fails
      */
     private void redirectToFrontendWithError(HttpServletResponse response, String error) throws IOException {
-        String frontendUrl = getFrontendBaseUrl();
+        String frontendUrl = "http://localhost:5173";
         String redirectUrl = String.format("%s/login?error=%s", frontendUrl, error);
         response.sendRedirect(redirectUrl);
     }
