@@ -3,6 +3,7 @@ package com.shopjoy.config;
 import com.shopjoy.entity.SecurityEventType;
 import com.shopjoy.service.CustomUserDetailsService;
 import com.shopjoy.service.SecurityAuditService;
+import com.shopjoy.service.TokenBlacklistService;
 import com.shopjoy.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -34,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
     private final SecurityAuditService securityAuditService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -54,6 +56,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             String jwtToken = authHeader.substring(BEARER_PREFIX.length());
+            
+            if (tokenBlacklistService.isBlacklisted(jwtToken)) {
+                log.debug("Token is blacklisted (user logged out)");
+                securityAuditService.logEvent(
+                    null,
+                    SecurityEventType.ACCESS_DENIED,
+                    request,
+                    "Attempted to use blacklisted token",
+                    false
+                );
+                filterChain.doFilter(request, response);
+                return;
+            }
+            
             String username = null;
 
             try {

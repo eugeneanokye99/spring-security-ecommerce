@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,19 +24,11 @@ import java.util.List;
  */
 @Tag(name = "Product Reviews", description = "APIs for managing product reviews including creating, rating, and querying customer reviews")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/reviews")
 public class ReviewController {
 
         private final ReviewService reviewService;
-
-        /**
-         * Instantiates a new Review controller.
-         *
-         * @param reviewService the review service
-         */
-        public ReviewController(ReviewService reviewService) {
-                this.reviewService = reviewService;
-        }
 
         /**
          * Create review response entity.

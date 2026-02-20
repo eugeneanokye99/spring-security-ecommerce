@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,19 +35,11 @@ import java.util.List;
 @Tag(name = "Product Management", description = "APIs for managing products including CRUD operations, pagination, filtering, sorting, and search capabilities with advanced algorithms")
 @Validated
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/products")
 public class ProductController {
 
         private final ProductService productService;
-
-        /**
-         * Instantiates a new Product controller.
-         *
-         * @param productService               the product service
-         */
-        public ProductController(ProductService productService) {
-                this.productService = productService;
-        }
 
 
 

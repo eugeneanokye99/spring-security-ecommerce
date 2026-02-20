@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,19 +20,11 @@ import java.util.List;
  */
 @Tag(name = "Inventory Management", description = "APIs for managing product stock levels including stock updates, reservations, and low stock monitoring")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/inventory")
 public class InventoryController {
 
     private final InventoryService inventoryService;
-
-    /**
-     * Instantiates a new Inventory controller.
-     *
-     * @param inventoryService the inventory service
-     */
-    public InventoryController(InventoryService inventoryService) {
-        this.inventoryService = inventoryService;
-    }
 
     /**
      * Gets inventory.

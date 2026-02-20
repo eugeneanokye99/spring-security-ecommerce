@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 
@@ -27,11 +28,13 @@ public class OrderQueryResolver {
 
 
     @QueryMapping
+    @PreAuthorize("isAuthenticated()")
     public OrderResponse order(@Argument Long id) {
         return orderService.getOrderById(id.intValue());
     }
 
     @QueryMapping
+    @PreAuthorize("isAuthenticated()")
     public OrderConnection orders(
             @Argument Long userId,
             @Argument OrderFilterInput filter,

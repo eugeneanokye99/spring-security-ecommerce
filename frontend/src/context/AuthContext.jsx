@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { authenticateUser } from '../services/userService';
 import { formatErrorMessage, isAuthenticationError } from '../utils/errorHandler';
 import { jwtDecode } from 'jwt-decode';
+import api from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -103,7 +104,21 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
+    const logout = async () => {
+        const token = localStorage.getItem('token');
+        
+        if (token) {
+            try {
+                await api.post('/auth/logout', {}, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
         setUser(null);
         localStorage.removeItem('user');
         localStorage.removeItem('token');

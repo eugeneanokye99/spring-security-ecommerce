@@ -6,14 +6,19 @@ import com.shopjoy.dto.request.LoginRequest;
 import com.shopjoy.dto.response.ApiResponse;
 import com.shopjoy.dto.response.LoginResponse;
 import com.shopjoy.dto.response.UserResponse;
+import com.shopjoy.entity.SecurityEventType;
 import com.shopjoy.entity.UserType;
 import com.shopjoy.service.AuthService;
+import com.shopjoy.service.SecurityAuditService;
+import com.shopjoy.service.TokenBlacklistService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,19 +31,15 @@ import java.util.Map;
  */
 @Tag(name = "Authentication", description = "APIs for user authentication including registration, login, and password management")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private final SecurityAuditService securityAuditService;
+    private final TokenBlacklistService tokenBlacklistService;
 
-    /**
-     * Instantiates a new Auth controller.
-     *
-     * @param authService the auth service
-     */
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+
 
     /**
      * Register a new user.
@@ -105,9 +106,89 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
-            @Valid @RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest servletRequest) {
+        try {
+            LoginResponse response = authService.login(request);
+            securityAuditService.logEvent(
+                request.getUsername(),
+                SecurityEventType.LOGIN_SUCCESS,
+                servletRequest,
+                "User logged in successfully",
+                true
+            );
+            return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
+        } catch (Exception e) {
+            securityAuditService.logEvent(
+                request.getUsername(),
+                SecurityEventType.LOGIN_FAILURE,
+                servletRequest,
+                "Login failed: " + e.getMessage(),
+                false
+            );
+            throw e;
+        }
+    }
+
+    /**
+     * Logout user by blacklisting their JWT token.
+     *
+     * @param request the HTTP servlet request containing the Authorization header
+     * @return the response entity
+     */
+    @Operation(
+            summary = "User logout",
+            description = "Logs out a user by blacklisting their JWT token. The token will no longer be valid for authentication."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Logout successful",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Missing or invalid Authorization header",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("Missing or invalid Authorization header"));
+        }
+        
+        String token = authHeader.substring(7);
+        
+        tokenBlacklistService.blacklistToken(token);
+        
+        try {
+            String username = org.springframework.security.core.context.SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getName();
+            
+            securityAuditService.logEvent(
+                username,
+                SecurityEventType.LOGOUT,
+                request,
+                "User logged out successfully",
+                true
+            );
+        } catch (Exception e) {
+            securityAuditService.logEvent(
+                null,
+                SecurityEventType.LOGOUT,
+                request,
+                "User logged out (username unavailable)",
+                true
+            );
+        }
+        
+        return ResponseEntity.ok(ApiResponse.success(null, "Logout successful"));
     }
 
     /**

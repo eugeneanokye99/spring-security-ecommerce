@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,19 +24,11 @@ import java.util.List;
  */
 @Tag(name = "Category Management", description = "APIs for managing product categories")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
-
-    /**
-     * Instantiates a new Category controller.
-     *
-     * @param categoryService the category service
-     */
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
 
     /**
      * Create category response entity.

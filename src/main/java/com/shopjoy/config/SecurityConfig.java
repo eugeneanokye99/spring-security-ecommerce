@@ -59,6 +59,9 @@ public class SecurityConfig {
                 // OAuth2 endpoints
                 .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                 
+                // GraphQL endpoints - require authentication
+                .requestMatchers("/graphql", "/graphiql").authenticated()
+                
                 // Public GET endpoints for browsing (read-only)
                 .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()

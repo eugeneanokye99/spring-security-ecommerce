@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,19 +23,11 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "Order Management", description = "APIs for order creation and payment processing")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
         private final OrderService orderService;
-
-        /**
-         * Instantiates a new Order controller.
-         *
-         * @param orderService the order service
-         */
-        public OrderController(OrderService orderService) {
-                this.orderService = orderService;
-        }
 
         /**
          * Create order response entity.

@@ -1,8 +1,10 @@
 package com.shopjoy.security;
 
+import com.shopjoy.entity.SecurityEventType;
 import com.shopjoy.entity.User;
 import com.shopjoy.entity.UserType;
 import com.shopjoy.repository.UserRepository;
+import com.shopjoy.service.SecurityAuditService;
 import com.shopjoy.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +33,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final SecurityAuditService securityAuditService;
 
 
     /**
@@ -97,6 +100,14 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             String jwtToken = jwtUtil.generateToken(userDetails);
             
             log.info("JWT token generated for OAuth2 user: {}", user.getUsername());
+            
+            securityAuditService.logEvent(
+                user.getUsername(),
+                SecurityEventType.LOGIN_SUCCESS,
+                request,
+                String.format("OAuth2 login successful via %s", provider),
+                true
+            );
             
             // Redirect to frontend with token
             String frontendUrl = "http://localhost:5173";

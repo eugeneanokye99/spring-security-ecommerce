@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -19,18 +20,21 @@ public class OrderMutationResolver {
     private final GraphQLMapperStruct graphQLMapper;
 
     @MutationMapping
+    @PreAuthorize("isAuthenticated()")
     public OrderResponse updateOrder(@Argument Long id, @Argument @Valid UpdateOrderInput input) {
         var request = graphQLMapper.toUpdateOrderRequest(input);
         return orderService.updateOrder(id.intValue(), request);
     }
 
     @MutationMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Boolean deleteOrder(@Argument Long id) {
         orderService.deleteOrder(id.intValue());
         return true;
     }
 
     @MutationMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public OrderResponse updateOrderStatus(@Argument Long id, @Argument String status) {
         OrderStatus orderStatus = OrderStatus.valueOf(status);
         return orderService.updateOrderStatus(id.intValue(), orderStatus);

@@ -20,9 +20,11 @@ import com.shopjoy.repository.OrderRepository;
 import com.shopjoy.repository.UserRepository;
 import com.shopjoy.repository.ProductRepository;
 import com.shopjoy.specification.OrderSpecification;
+import com.shopjoy.entity.SecurityEventType;
 import com.shopjoy.service.InventoryService;
 import com.shopjoy.service.OrderService;
 import com.shopjoy.service.ProductService;
+import com.shopjoy.service.SecurityAuditService;
 import com.shopjoy.service.UserService;
 import com.shopjoy.util.SecurityUtil;
 import lombok.AllArgsConstructor;
@@ -62,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductService productService;
     private final UserService userService;
     private final OrderMapperStruct orderMapper;
+    private final SecurityAuditService securityAuditService;
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -83,6 +86,17 @@ public class OrderServiceImpl implements OrderService {
         Order createdOrder = buildAndSaveOrder(request, totalAmount);
         
         createAndSaveOrderItems(createdOrder, request.getOrderItems(), productsById);
+
+        String username = userService.getUserById(request.getUserId()).getUsername();
+        securityAuditService.logEvent(
+            username,
+            SecurityEventType.ORDER_CREATED,
+            String.format("Order #%d created with %d items, total amount: $%.2f",
+                createdOrder.getId(),
+                request.getOrderItems().size(),
+                totalAmount),
+            true
+        );
 
         return getOrderById(createdOrder.getId());
     }
@@ -242,6 +256,15 @@ public class OrderServiceImpl implements OrderService {
 
         Order updatedOrder = orderRepository.save(order);
 
+        String username = String.valueOf(SecurityUtil.getCurrentUsername());
+        securityAuditService.logEvent(
+            username,
+            SecurityEventType.ORDER_STATUS_CHANGED,
+            String.format("Order #%d status changed from %s to %s",
+                orderId, currentStatus, newStatus),
+            true
+        );
+
         return orderMapper.toOrderResponse(updatedOrder);
     }
 
@@ -339,6 +362,15 @@ public class OrderServiceImpl implements OrderService {
         order.setUpdatedAt(LocalDateTime.now());
 
         Order cancelledOrder = orderRepository.save(order);
+
+        String username = userService.getUserById(orderOwnerId).getUsername();
+        securityAuditService.logEvent(
+            username,
+            SecurityEventType.ORDER_CANCELLED,
+            String.format("Order #%d cancelled, %d item(s) returned to inventory",
+                orderId, orderItems.size()),
+            true
+        );
 
         return orderMapper.toOrderResponse(cancelledOrder);
     }

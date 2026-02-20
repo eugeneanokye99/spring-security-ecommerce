@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,19 +23,11 @@ import java.util.List;
  */
 @Tag(name = "Shopping Cart", description = "APIs for managing user shopping carts including adding, updating, and removing items")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/cart")
 public class CartController {
 
     private final CartService cartService;
-
-    /**
-     * Instantiates a new Cart controller.
-     *
-     * @param cartService the cart service
-     */
-    public CartController(CartService cartService) {
-        this.cartService = cartService;
-    }
 
     /**
      * Add to cart response entity.

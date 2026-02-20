@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,19 +22,11 @@ import java.util.List;
  */
 @Tag(name = "User Management", description = "APIs for managing user profiles and user queries")
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;
-
-    /**
-     * Instantiates a new User controller.
-     *
-     * @param userService the user service
-     */
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     /**
      * Gets user by id.
