@@ -20,11 +20,55 @@ public interface SecurityAuditService {
      *
      * @param username  the username (can be null for anonymous events)
      * @param eventType the type of security event
-     * @param request   the HTTP request (used to extract IP and user agent)
+     * @param ipAddress the client IP address
+     * @param userAgent the user agent string
      * @param details   additional details about the event
      * @param success   whether the event was successful
      */
-    void logEvent(String username, SecurityEventType eventType, HttpServletRequest request, String details, Boolean success);
+    void logEvent(String username, SecurityEventType eventType, String ipAddress, String userAgent, String details, Boolean success);
+
+    /**
+     * Extract client IP address from HTTP request.
+     * Must be called in the request thread before async processing.
+     *
+     * @param request the HTTP request
+     * @return the client IP address
+     */
+    static String extractClientIp(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty()) {
+            return xRealIp;
+        }
+
+        return request.getRemoteAddr();
+    }
+
+    /**
+     * Extract user agent from HTTP request.
+     * Must be called in the request thread before async processing.
+     *
+     * @param request the HTTP request
+     * @return the user agent string (truncated to 500 chars)
+     */
+    static String extractUserAgent(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent != null && userAgent.length() > 500) {
+            return userAgent.substring(0, 500);
+        }
+        return userAgent;
+    }
 
     /**
      * Log a security event without HTTP request context.

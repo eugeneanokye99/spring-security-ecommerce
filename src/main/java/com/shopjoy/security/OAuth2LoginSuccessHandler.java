@@ -101,10 +101,14 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             
             log.info("JWT token generated for OAuth2 user: {}", user.getUsername());
             
+            String ipAddress = SecurityAuditService.extractClientIp(request);
+            String userAgent = SecurityAuditService.extractUserAgent(request);
+            
             securityAuditService.logEvent(
                 user.getUsername(),
                 SecurityEventType.LOGIN_SUCCESS,
-                request,
+                ipAddress,
+                userAgent,
                 String.format("OAuth2 login successful via %s", provider),
                 true
             );

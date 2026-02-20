@@ -47,6 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        String ipAddress = SecurityAuditService.extractClientIp(request);
+        String userAgent = SecurityAuditService.extractUserAgent(request);
+
         try {
             String authHeader = request.getHeader(AUTHORIZATION_HEADER);
 
@@ -62,7 +65,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 securityAuditService.logEvent(
                     null,
                     SecurityEventType.ACCESS_DENIED,
-                    request,
+                    ipAddress,
+                    userAgent,
                     "Attempted to use blacklisted token",
                     false
                 );
@@ -79,7 +83,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 securityAuditService.logEvent(
                     e.getClaims().getSubject(),
                     SecurityEventType.TOKEN_EXPIRED,
-                    request,
+                    ipAddress,
+                    userAgent,
                     "JWT token expired: " + request.getRequestURI(),
                     false
                 );
@@ -90,7 +95,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 securityAuditService.logEvent(
                     null,
                     SecurityEventType.TOKEN_INVALID,
-                    request,
+                    ipAddress,
+                    userAgent,
                     "Invalid JWT token: " + e.getMessage(),
                     false
                 );
@@ -120,7 +126,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     securityAuditService.logEvent(
                         username,
                         SecurityEventType.TOKEN_INVALID,
-                        request,
+                        ipAddress,
+                        userAgent,
                         "Token validation failed",
                         false
                     );
@@ -132,7 +139,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             securityAuditService.logEvent(
                 null,
                 SecurityEventType.TOKEN_INVALID,
-                request,
+                ipAddress,
+                userAgent,
                 "JWT authentication error: " + e.getMessage(),
                 false
             );

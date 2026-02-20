@@ -108,12 +108,16 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest servletRequest) {
+        String ipAddress = SecurityAuditService.extractClientIp(servletRequest);
+        String userAgent = SecurityAuditService.extractUserAgent(servletRequest);
+        
         try {
             LoginResponse response = authService.login(request);
             securityAuditService.logEvent(
                 request.getUsername(),
                 SecurityEventType.LOGIN_SUCCESS,
-                servletRequest,
+                ipAddress,
+                userAgent,
                 "User logged in successfully",
                 true
             );
@@ -122,7 +126,8 @@ public class AuthController {
             securityAuditService.logEvent(
                 request.getUsername(),
                 SecurityEventType.LOGIN_FAILURE,
-                servletRequest,
+                ipAddress,
+                userAgent,
                 "Login failed: " + e.getMessage(),
                 false
             );
@@ -162,6 +167,8 @@ public class AuthController {
         }
         
         String token = authHeader.substring(7);
+        String ipAddress = SecurityAuditService.extractClientIp(request);
+        String userAgent = SecurityAuditService.extractUserAgent(request);
         
         tokenBlacklistService.blacklistToken(token);
         
@@ -174,7 +181,8 @@ public class AuthController {
             securityAuditService.logEvent(
                 username,
                 SecurityEventType.LOGOUT,
-                request,
+                ipAddress,
+                userAgent,
                 "User logged out successfully",
                 true
             );
@@ -182,7 +190,8 @@ public class AuthController {
             securityAuditService.logEvent(
                 null,
                 SecurityEventType.LOGOUT,
-                request,
+                ipAddress,
+                userAgent,
                 "User logged out (username unavailable)",
                 true
             );

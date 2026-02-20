@@ -11,9 +11,11 @@ import com.shopjoy.entity.User;
 import com.shopjoy.entity.UserType;
 import com.shopjoy.exception.AuthenticationException;
 import com.shopjoy.exception.DuplicateResourceException;
+import com.shopjoy.exception.RateLimitExceededException;
 import com.shopjoy.exception.ResourceNotFoundException;
 import com.shopjoy.repository.UserRepository;
 import com.shopjoy.service.AuthService;
+import com.shopjoy.service.RateLimitService;
 import com.shopjoy.util.AuthValidationUtil;
 import com.shopjoy.util.JwtUtil;
 import com.shopjoy.util.SecurityUtil;
@@ -26,7 +28,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 /**
@@ -42,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final RateLimitService rateLimitService;
 
     @Override
     @Transactional
@@ -70,6 +76,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponse login(LoginRequest request) {
         AuthValidationUtil.validateLoginRequest(request);
+        
+        String clientIp = extractClientIp();
+        
+        if (rateLimitService.isRateLimited(request.getUsername(), clientIp)) {
+            long retryAfter = rateLimitService.getRetryAfterSeconds(request.getUsername(), clientIp);
+            throw new RateLimitExceededException(
+                "Too many failed login attempts. Please try again in " + (retryAfter / 60) + " minutes.",
+                retryAfter
+            );
+        }
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -83,6 +99,8 @@ public class AuthServiceImpl implements AuthService {
 
             assert userDetails != null;
             String jwtToken = jwtUtil.generateToken(userDetails);
+            
+            rateLimitService.resetAttempts(request.getUsername(), clientIp);
 
             return LoginResponse.builder()
                     .token(jwtToken)
@@ -91,8 +109,26 @@ public class AuthServiceImpl implements AuthService {
                     .build();
 
         } catch (org.springframework.security.core.AuthenticationException e) {
+            rateLimitService.recordLoginAttempt(request.getUsername(), clientIp);
             throw new AuthenticationException("Invalid username or password");
         }
+    }
+    
+    private String extractClientIp() {
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+                String xForwardedFor = request.getHeader("X-Forwarded-For");
+                if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+                    return xForwardedFor.split(",")[0].trim();
+                }
+                return request.getRemoteAddr();
+            }
+        } catch (Exception e) {
+            return "0.0.0.0";
+        }
+        return "0.0.0.0";
     }
 
     @Override

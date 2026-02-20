@@ -21,24 +21,7 @@ import org.springframework.http.HttpMethod;
 
 /**
  * Configuration for Spring Security with JWT and OAuth2 support.
- * 
- * This configuration demonstrates the difference between:
- * 1. CSRF protection for form-based/session-based endpoints (/demo/*)
- * 2. No CSRF protection for JWT-based stateless API endpoints (/api/**)
- * 
- * WHY CSRF IS DISABLED FOR JWT APIs:
- * - JWT tokens are stored in localStorage/sessionStorage, not cookies
- * - Browsers do NOT automatically attach JWT tokens to requests
- * - Attacker cannot force victim's browser to send authenticated requests
- * - CSRF attacks rely on automatic cookie attachment by browsers
- * - Therefore, JWT APIs are inherently protected from CSRF attacks
- * 
- * WHY CSRF IS ENABLED FOR FORM ENDPOINTS:
- * - Session-based authentication uses cookies (JSESSIONID)
- * - Browsers automatically attach cookies to ALL requests to the domain
- * - Attacker can trick user into submitting malicious form on attacker's site
- * - Browser will automatically send session cookie, authenticating the request
- * - CSRF token prevents this by requiring a secret token that attacker cannot obtain
+ *
  */
 @Configuration
 @EnableWebSecurity
@@ -64,14 +47,6 @@ public class SecurityConfig {
 
     /**
      * Security filter chain for form-based demo endpoints with CSRF protection.
-     * 
-     * This filter chain applies to /demo/** endpoints and demonstrates traditional
-     * session-based security with CSRF protection. It is evaluated first (@Order(1)).
-     * 
-     * CSRF PROTECTION ENABLED because:
-     * - These endpoints use session-based authentication (cookies)
-     * - Browsers automatically send cookies with every request
-     * - Vulnerable to CSRF attacks without token protection
      * 
      * @param http HttpSecurity configuration
      * @return configured SecurityFilterChain with CSRF enabled
@@ -102,15 +77,6 @@ public class SecurityConfig {
 
     /**
      * Security filter chain for OAuth2 social login endpoints.
-     * 
-     * This filter chain is dedicated to OAuth2 authentication (Google login).
-     * It is evaluated second (@Order(2)) and only applies to OAuth2-specific paths.
-     * 
-     * ISOLATED FROM API ENDPOINTS:
-     * - Only handles /oauth2/** and /login/oauth2/** paths
-     * - Doesn't interfere with JWT-based API testing
-     * - Enables social login without affecting Postman testing
-     * - Uses session-based authentication for OAuth2 flow
      *
      * @param http HttpSecurity configuration
      * @return configured SecurityFilterChain for OAuth2
@@ -135,17 +101,6 @@ public class SecurityConfig {
 
     /**
      * Security filter chain for JWT-based API endpoints WITHOUT CSRF protection.
-     * 
-     * This filter chain applies to API and GraphQL endpoints using JWT authentication.
-     * It is evaluated third (@Order(3)) after form and OAuth2 filter chains.
-     * 
-     * CSRF PROTECTION DISABLED because:
-     * - JWT tokens are stored in localStorage/sessionStorage, NOT cookies
-     * - Browsers do NOT automatically attach Authorization headers
-     * - Attacker cannot force victim's browser to send JWT token
-     * - JWT APIs are inherently immune to CSRF attacks
-     * - CSRF relies on automatic credential submission (cookies), which doesn't apply to JWTs
-     * 
      *
      * @param http HttpSecurity configuration
      * @return configured SecurityFilterChain with CSRF disabled

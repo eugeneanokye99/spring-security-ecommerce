@@ -29,13 +29,13 @@ public class SecurityAuditServiceImpl implements SecurityAuditService {
     @Async
     @Transactional
     @Override
-    public void logEvent(String username, SecurityEventType eventType, HttpServletRequest request, String details, Boolean success) {
+    public void logEvent(String username, SecurityEventType eventType, String ipAddress, String userAgent, String details, Boolean success) {
         try {
             SecurityAuditLog auditLog = SecurityAuditLog.builder()
                     .username(username)
                     .eventType(eventType)
-                    .ipAddress(extractClientIp(request))
-                    .userAgent(extractUserAgent(request))
+                    .ipAddress(ipAddress)
+                    .userAgent(userAgent)
                     .details(details)
                     .success(success)
                     .build();
@@ -66,34 +66,7 @@ public class SecurityAuditServiceImpl implements SecurityAuditService {
         }
     }
 
-    private String extractClientIp(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
 
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-
-        String xRealIp = request.getHeader("X-Real-IP");
-        if (xRealIp != null && !xRealIp.isEmpty()) {
-            return xRealIp;
-        }
-
-        return request.getRemoteAddr();
-    }
-
-    private String extractUserAgent(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
-        String userAgent = request.getHeader("User-Agent");
-        if (userAgent != null && userAgent.length() > 500) {
-            return userAgent.substring(0, 500);
-        }
-        return userAgent;
-    }
 
     @Transactional(readOnly = true)
     @Override

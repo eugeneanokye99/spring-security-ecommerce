@@ -258,6 +258,28 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * Handles RateLimitExceededException - when too many login attempts are detected.
+     * Returns 429 Too Many Requests with Retry-After header.
+     * Example: User attempts login 5 times within 15 minutes
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRateLimitExceeded(RateLimitExceededException ex) {
+        logger.warn("Rate limit exceeded: {}", ex.getMessage());
+        
+        ErrorDetail error = new ErrorDetail(
+                "rate_limit",
+                ex.getMessage(),
+                ex.getErrorCode()
+        );
+        
+        ApiResponse<Object> response = ApiResponse.error(ex.getMessage(), error);
+        
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("Retry-After", String.valueOf(ex.getRetryAfterSeconds()))
+                .body(response);
+    }
+    
+    /**
      * Handles general BusinessException - business rule violations.
      * Returns 400 Bad Request.
      * This is a catch-all for business exceptions that don't have specific handlers.
