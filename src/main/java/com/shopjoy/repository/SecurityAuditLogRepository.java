@@ -28,11 +28,6 @@ public interface SecurityAuditLogRepository extends JpaRepository<SecurityAuditL
 
     Page<SecurityAuditLog> findByUsernameAndEventType(String username, SecurityEventType eventType, Pageable pageable);
 
-    Page<SecurityAuditLog> findByUsernameAndTimestampBetween(String username, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
-
-
-    Page<SecurityAuditLog> findByEventTypeAndTimestampBetween(SecurityEventType eventType, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
-
 
     @Query("SELECT s FROM SecurityAuditLog s WHERE s.username = :username AND s.eventType = :eventType AND s.timestamp >= :since ORDER BY s.timestamp DESC")
     List<SecurityAuditLog> findRecentFailedAttempts(@Param("username") String username,
@@ -45,10 +40,5 @@ public interface SecurityAuditLogRepository extends JpaRepository<SecurityAuditL
                                              @Param("startTime") LocalDateTime startTime,
                                              @Param("endTime") LocalDateTime endTime);
 
-    @Query("SELECT s.username, COUNT(s) as attemptCount FROM SecurityAuditLog s " +
-            "WHERE s.eventType = :eventType AND s.timestamp >= :since AND s.username IS NOT NULL " +
-            "GROUP BY s.username ORDER BY attemptCount DESC")
-    List<Object[]> findTopFailedLoginUsernames(@Param("eventType") SecurityEventType eventType,
-                                                @Param("since") LocalDateTime since,
-                                                Pageable pageable);
+
 }

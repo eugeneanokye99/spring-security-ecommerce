@@ -4,7 +4,6 @@ import com.shopjoy.entity.SecurityAuditLog;
 import com.shopjoy.entity.SecurityEventType;
 import com.shopjoy.repository.SecurityAuditLogRepository;
 import com.shopjoy.service.SecurityAuditService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

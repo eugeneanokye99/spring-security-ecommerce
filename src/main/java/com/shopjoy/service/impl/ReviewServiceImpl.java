@@ -8,7 +8,6 @@ import com.shopjoy.entity.Review;
 import com.shopjoy.exception.BusinessException;
 import com.shopjoy.exception.ResourceNotFoundException;
 import com.shopjoy.exception.ValidationException;
-import com.shopjoy.repository.OrderRepository;
 import com.shopjoy.repository.ProductRepository;
 import com.shopjoy.repository.ReviewRepository;
 import com.shopjoy.repository.UserRepository;
@@ -37,7 +36,6 @@ import java.util.stream.Collectors;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ReviewMapperStruct reviewMapper;
@@ -62,9 +60,6 @@ public class ReviewServiceImpl implements ReviewService {
         review.setProduct(productRepository.getReferenceById(request.getProductId()));
         
         validateReviewData(review);
-
-        boolean hasPurchased = orderRepository.hasUserPurchasedProduct(
-                request.getUserId(), request.getProductId());
 
         review.setCreatedAt(LocalDateTime.now());
         review.setHelpfulCount(0);

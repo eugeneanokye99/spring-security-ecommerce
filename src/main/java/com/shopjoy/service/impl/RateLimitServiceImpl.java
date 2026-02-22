@@ -27,12 +27,10 @@ public class RateLimitServiceImpl implements RateLimitService {
     
     private static class LoginAttempt {
         int count;
-        LocalDateTime firstAttemptTime;
         LocalDateTime lastAttemptTime;
         
         LoginAttempt() {
             this.count = 1;
-            this.firstAttemptTime = LocalDateTime.now();
             this.lastAttemptTime = LocalDateTime.now();
         }
         

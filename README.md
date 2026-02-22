@@ -1,6 +1,6 @@
 # ShopJoy E-Commerce System
 
-A comprehensive, enterprise-grade e-commerce platform built with Spring Boot, featuring dual API paradigms (REST and GraphQL), advanced Spring Security implementation with JWT and OAuth2, role-based authorization, multi-tier caching, and comprehensive performance monitoring with AOP.
+ A comprehensive, enterprise-grade e-commerce platform built with Spring Boot, featuring dual API paradigms (REST and GraphQL), advanced Spring Security implementation with JWT and OAuth2, role-based authorization, multi-tier caching, and comprehensive performance monitoring with AOP.
 
 ## Table of Contents
 
