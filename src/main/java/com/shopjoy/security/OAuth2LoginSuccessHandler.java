@@ -99,7 +99,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 true
             );
             
-            String frontendUrl = "http://localhost:5173";
+            String frontendUrl = "http://localhost:5172";
             String redirectUrl = String.format("%s/oauth2/callback?token=%s&provider=%s", 
                     frontendUrl, jwtToken, provider);
             
@@ -143,7 +143,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         User newUser = User.builder()
                 .username(username)
                 .email(email)
-                .passwordHash("OAUTH2_USER_NO_PASSWORD")
+                .passwordHash(null)
                 .firstName(firstName)
                 .lastName(lastName)
                 .userType(UserType.CUSTOMER)

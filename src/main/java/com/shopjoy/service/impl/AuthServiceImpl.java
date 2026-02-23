@@ -141,6 +141,14 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
+        // Check if user is OAuth2 user (no password set)
+        if (user.getPasswordHash() == null) {
+            throw new AuthenticationException(
+                "Cannot change password for OAuth2 accounts. This account uses " + 
+                (user.getOauthProvider() != null ? user.getOauthProvider() : "OAuth2") + " authentication."
+            );
+        }
+
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
             throw new AuthenticationException("Current password is incorrect");
         }

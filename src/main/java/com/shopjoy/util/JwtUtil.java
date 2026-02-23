@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Utility class for JWT token generation and validation.
@@ -37,11 +36,6 @@ public class JwtUtil {
      */
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        
-        String roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-        claims.put("roles", roles);
         
         String role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
