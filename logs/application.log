@@ -2615,3 +2615,86 @@ org.springframework.web.HttpRequestMethodNotSupportedException: Request method '
 2026-02-23 11:59:12.048 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 11:59:12.048] EXITING: TokenBlacklistServiceImpl.removeExpiredTokens returned: void
 2026-02-23 11:59:12.048 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 11:59:12.048] ENTERING: RateLimitServiceImpl.removeExpiredEntries with arguments: []
 2026-02-23 11:59:12.048 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 11:59:12.048] EXITING: RateLimitServiceImpl.removeExpiredEntries returned: void
+2026-02-23 12:29:12.039 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 12:29:12.039] ENTERING: RateLimitServiceImpl.removeExpiredEntries with arguments: []
+2026-02-23 12:29:12.039 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 12:29:12.039] EXITING: RateLimitServiceImpl.removeExpiredEntries returned: void
+2026-02-23 12:59:12.046 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 12:59:12.044] ENTERING: TokenBlacklistServiceImpl.removeExpiredTokens with arguments: []
+2026-02-23 12:59:12.047 [scheduling-1] DEBUG c.s.s.impl.TokenBlacklistServiceImpl - Blacklist cleanup: No expired tokens found. Current size: 0
+2026-02-23 12:59:12.047 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 12:59:12.047] EXITING: TokenBlacklistServiceImpl.removeExpiredTokens returned: void
+2026-02-23 12:59:12.049 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 12:59:12.049] ENTERING: RateLimitServiceImpl.removeExpiredEntries with arguments: []
+2026-02-23 12:59:12.049 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 12:59:12.049] EXITING: RateLimitServiceImpl.removeExpiredEntries returned: void
+2026-02-23 13:29:12.044 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 13:29:12.044] ENTERING: RateLimitServiceImpl.removeExpiredEntries with arguments: []
+2026-02-23 13:29:12.045 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 13:29:12.044] EXITING: RateLimitServiceImpl.removeExpiredEntries returned: void
+2026-02-23 13:59:12.043 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 13:59:12.043] ENTERING: TokenBlacklistServiceImpl.removeExpiredTokens with arguments: []
+2026-02-23 13:59:12.043 [scheduling-1] DEBUG c.s.s.impl.TokenBlacklistServiceImpl - Blacklist cleanup: No expired tokens found. Current size: 0
+2026-02-23 13:59:12.043 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 13:59:12.043] EXITING: TokenBlacklistServiceImpl.removeExpiredTokens returned: void
+2026-02-23 13:59:12.045 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 13:59:12.043] ENTERING: RateLimitServiceImpl.removeExpiredEntries with arguments: []
+2026-02-23 13:59:12.045 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 13:59:12.045] EXITING: RateLimitServiceImpl.removeExpiredEntries returned: void
+2026-02-23 14:29:12.044 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 14:29:12.043] ENTERING: RateLimitServiceImpl.removeExpiredEntries with arguments: []
+2026-02-23 14:29:12.044 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 14:29:12.044] EXITING: RateLimitServiceImpl.removeExpiredEntries returned: void
+2026-02-23 14:47:39.429 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-23 14:47:39.451 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-23 14:47:39.492 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-23 14:47:39.518 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-02-23 14:47:39.539 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-02-23 14:47:59.876 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Starting ShopjoyEcommerceSystemApplication using Java 25.0.1 with PID 25944 (C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce\target\classes started by EugeneDokyeAnokye in C:\Users\EugeneDokyeAnokye\IdeaProjects\spring-data-ecommerce)
+2026-02-23 14:47:59.882 [main] DEBUG c.s.ShopjoyEcommerceSystemApplication - Running with Spring Boot v4.0.2, Spring v7.0.3
+2026-02-23 14:47:59.884 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - The following 1 profile is active: "dev"
+2026-02-23 14:48:00.828 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-02-23 14:48:04.340 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-23 14:48:04.867 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 504 ms. Found 10 JPA repository interfaces.
+2026-02-23 14:48:09.082 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-02-23 14:48:09.110 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-02-23 14:48:09.115 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-23 14:48:09.115 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-23 14:48:09.322 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 9293 ms
+2026-02-23 14:48:10.993 [main] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-23 14:48:11.133 [main] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-02-23 14:48:12.443 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-23 14:48:12.540 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-23 14:48:13.008 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@48682f91
+2026-02-23 14:48:13.011 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-23 14:48:13.240 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/shopjoy_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.1
+	Default catalog/schema: shopjoy_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-23 14:48:16.333 [main] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-23 14:48:16.554 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-23 14:48:17.821 [main] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-23 14:48:20.764 [main] DEBUG c.s.config.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-02-23 14:48:21.444 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-02-23 14:48:28.994 [main] INFO  o.s.g.e.DefaultSchemaResourceGraphQlSourceBuilder - Loaded 1 resource(s) in the GraphQL schema.
+2026-02-23 14:48:29.440 [main] INFO  o.s.b.g.a.GraphQlAutoConfiguration - GraphQL schema inspection:
+	Unmapped fields: {Inventory=[reservedQuantity]}
+	Unmapped registrations: {Review.user=@BatchMapping ReviewFieldResolver#user[1 args]}
+	Unmapped arguments: {}
+	Field nullness errors: {}
+	Argument nullness errors: {}
+	Skipped types: []
+2026-02-23 14:48:29.514 [main] INFO  o.s.b.g.a.s.GraphQlWebMvcAutoConfiguration - GraphQL endpoint HTTP POST /graphql
+2026-02-23 14:48:32.040 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-23 14:48:32.216 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-02-23 14:48:32.234 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-02-23 14:48:32.265 [main] INFO  c.s.ShopjoyEcommerceSystemApplication - Started ShopjoyEcommerceSystemApplication in 33.818 seconds (process running for 35.24)
+2026-02-23 14:48:32.281 [main] INFO  c.s.config.AdminUserInitializer - Checking for existing admin user with username: admin
+2026-02-23 14:48:32.284 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 14:48:32.284] ENTERING: TokenBlacklistServiceImpl.removeExpiredTokens with arguments: []
+2026-02-23 14:48:32.285 [scheduling-1] DEBUG c.s.s.impl.TokenBlacklistServiceImpl - Blacklist cleanup: No expired tokens found. Current size: 0
+2026-02-23 14:48:32.286 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 14:48:32.286] EXITING: TokenBlacklistServiceImpl.removeExpiredTokens returned: void
+2026-02-23 14:48:32.290 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 14:48:32.290] ENTERING: RateLimitServiceImpl.removeExpiredEntries with arguments: []
+2026-02-23 14:48:32.290 [scheduling-1] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 14:48:32.290] EXITING: RateLimitServiceImpl.removeExpiredEntries returned: void
+2026-02-23 14:48:32.293 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@2099879886 wrapping org.postgresql.jdbc.PgConnection@48682f91] read-only
+2026-02-23 14:48:32.297 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 14:48:32.297] ENTERING: AuthServiceImpl.isUsernameTaken with arguments: [admin]
+2026-02-23 14:48:32.307 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-23 14:48:32.307] TRANSACTION START: AuthServiceImpl.isUsernameTaken(String)
+2026-02-23 14:48:32.441 [main] DEBUG org.hibernate.SQL - select u1_0.user_id from users u1_0 where u1_0.username=? fetch first ? rows only
+2026-02-23 14:48:32.465 [main] INFO  c.shopjoy.aspect.TransactionAspect - [2026-02-23 14:48:32.465] TRANSACTION COMMIT: AuthServiceImpl.isUsernameTaken(String)
+2026-02-23 14:48:32.465 [main] INFO  com.shopjoy.aspect.LoggingAspect - [2026-02-23 14:48:32.465] EXITING: AuthServiceImpl.isUsernameTaken returned: Boolean
+2026-02-23 14:48:32.470 [main] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@2099879886 wrapping org.postgresql.jdbc.PgConnection@48682f91]
+2026-02-23 14:48:32.471 [main] INFO  c.s.config.AdminUserInitializer - Admin user 'admin' already exists, skipping creation
+2026-02-23 14:48:32.472 [main] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'

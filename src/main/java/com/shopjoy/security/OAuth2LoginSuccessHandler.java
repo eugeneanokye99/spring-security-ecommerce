@@ -99,7 +99,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 true
             );
             
-            String frontendUrl = "http://localhost:5172";
+            String frontendUrl = "http://localhost:5173";
             String redirectUrl = String.format("%s/oauth2/callback?token=%s&provider=%s", 
                     frontendUrl, jwtToken, provider);
             
